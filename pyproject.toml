@@ -1,0 +1,38 @@
+[project]
+name = "genesis-robust-rl"
+version = "0.1.0"
+description = "Robust RL wrapper for quadrotor drones using Genesis simulator"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "gymnasium>=0.29",
+    "numpy>=1.24",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+]
+genesis = [
+    "genesis-world>=0.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/genesis_robust_rl"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
