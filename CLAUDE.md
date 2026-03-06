@@ -16,6 +16,12 @@
 - `docs/01_perturbations_catalog.md` must be complete and validated before any env code
 - `docs/02_class_design.md` must be validated before any class is written
 
+## Feasibility Rule (MANDATORY)
+- `docs/00_feasibility.md` is the Genesis API feasibility reference — read it before any design decision
+- **Every perturbation** in `docs/01_perturbations_catalog.md` MUST reference a finding in `00_feasibility.md`
+- Any perturbation marked `Unknown` or `High` risk in `00_feasibility.md` must be explicitly flagged in the catalog
+- Do not design perturbations that have no feasibility entry — add one first
+
 ## Code Standards
 - **Python with UV** (`uv add`, `uv run`)
 - **Type hints** in all function signatures

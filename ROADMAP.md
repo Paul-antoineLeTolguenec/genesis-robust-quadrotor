@@ -14,11 +14,14 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ## Phase 0 — Project Setup
 - [x] Create GitHub repo
 - [x] Clone locally, init CLAUDE.md + ROADMAP.md
-- [ ] Init Python project (pyproject.toml, UV, src layout)
-- [ ] Setup CI (GitHub Actions: lint + tests)
+- [x] Init Python project (pyproject.toml, UV, src layout)
+- [x] Setup CI (GitHub Actions: lint + tests)
+
+## Phase 0.5 — Feasibility Study
+- [x] `docs/00_feasibility.md` — Genesis API feasibility verified and documented
 
 ## Phase 1 — Design (no code)
-- [ ] `docs/01_perturbations_catalog.md` — complete perturbation catalog validated
+- [ ] `docs/01_perturbations_catalog.md` — complete perturbation catalog validated (must ref 00_feasibility.md)
 - [ ] `docs/02_class_design.md` — class hierarchy validated
 - [ ] `docs/03_api_design.md` — Gym + adversarial API validated
 - [ ] `docs/04_interactions.md` — component interactions validated
@@ -62,4 +65,6 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 0 — Project Setup** (in progress)
+**Phase 1 — Design** (not started)
+
+Next step: write `docs/01_perturbations_catalog.md` (must reference `docs/00_feasibility.md` for every entry).
