@@ -33,7 +33,10 @@ try:
 except ImportError:
     _GENESIS_AVAILABLE = False
 
-pytestmark = pytest.mark.skipif(not _GENESIS_AVAILABLE, reason="Genesis not installed")
+pytestmark = [
+    pytest.mark.genesis,
+    pytest.mark.skipif(not _GENESIS_AVAILABLE, reason="Genesis not installed"),
+]
 
 logger = logging.getLogger(__name__)
 

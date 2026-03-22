@@ -40,11 +40,12 @@ select = ["E", "F", "I"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--tb=short -m 'not perf'"
+addopts = "--tb=short -m 'not perf and not genesis'"
 markers = [
     "unit: unit tests — no Genesis, mocked EnvState (fast, CPU-only)",
     "integration: integration tests — real EnvState, mocked Genesis scene",
     "perf: performance tests — GPU required, n_envs=512",
+    "genesis: requires real Genesis runtime (GPU/EGL) — run locally only",
 ]
 
 [tool.coverage.run]
