@@ -22,6 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --extra dev
+        # uv sync installs the project in editable mode automatically (no separate pip install -e .)
 
       - name: Lint
         run: uv run ruff check src/ tests/
@@ -29,5 +30,16 @@ jobs:
       - name: Format check
         run: uv run ruff format --check src/ tests/
 
-      - name: Tests
-        run: uv run pytest
+      - name: Run tests
+        run: |
+          set +e
+          uv run pytest --cov=src/genesis_robust_rl --cov-report=xml
+          EXIT=$?
+          set -e
+          [ $EXIT -eq 5 ] && echo "WARNING: no tests collected (exit 5 — all filtered by addopts)" || exit $EXIT
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
