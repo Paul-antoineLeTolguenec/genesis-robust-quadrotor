@@ -4,6 +4,9 @@
 At the start of each session, read this file to locate the current milestone.
 Update status when starting (`in_progress`) and when done (`completed`).
 
+**Design review rule:** before marking any design doc `[x]`, launch 2–3 parallel review subagents
+(see `CLAUDE.md` → "Design Review Protocol"). Resolve all blocking issues first.
+
 ## Status legend
 - `[ ]` not started
 - `[~]` in progress
@@ -21,19 +24,41 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] `docs/00_feasibility.md` — Genesis API feasibility verified and documented
 
 ## Phase 1 — Design (no code)
-- [ ] `docs/01_perturbations_catalog.md` — complete perturbation catalog validated (must ref 00_feasibility.md)
-- [ ] `docs/02_class_design.md` — class hierarchy validated
-- [ ] `docs/03_api_design.md` — Gym + adversarial API validated
-- [ ] `docs/04_interactions.md` — component interactions validated
+- [x] `docs/01_perturbations_catalog.md` — complete perturbation catalog validated (must ref 00_feasibility.md)
+- [x] `docs/00b_sensor_models.md` — phenomenological sensor forward models (gyro, accel, mag, baro, GPS, optical flow)
+- [x] `docs/02_class_design.md` — class hierarchy validated (includes SensorModel layer)
+- [x] `docs/05_test_conventions.md` — mandatory test contract for subagents (unit + integration + perf)
+- [x] `docs/03_api_design.md` — Gym + adversarial API validated
+- [x] `docs/04_interactions.md` — component interactions validated
 
-## Phase 2 — Perturbation Engine
-- [ ] Base `Perturbation` class (bounds, modes, distributions)
-- [ ] Rectangular dynamics
-- [ ] Lipschitz dynamics (with delta_t dependency)
-- [ ] Observation delay buffer (delta_k)
-- [ ] Distribution sampling (gaussian, beta, uniform)
+## Phase 1.5 — Test Infrastructure (prerequisite for parallel implementation)
+> Goal: give each subagent a self-contained test harness so it can autonomously validate its work.
+> Each subagent receives: `02_class_design.md` + `05_test_conventions.md` + `06_test_infrastructure.md` + catalog entries for its category.
+> A subagent's work is DONE only when all its tests pass (unit + integration + perf).
+
+- [x] `docs/06_test_infrastructure.md` — test infrastructure design validated
+- [x] `pytest` + `pytest-cov` configured in `pyproject.toml`
+- [x] `tests/conftest.py` — shared fixtures:
+  - `mock_env_state(n_envs)` — realistic `EnvState` tensor batch
+  - `mock_scene()` — Genesis scene stub with patched setters
+  - `assert_lipschitz(perturbation, n_steps)` — helper to verify Lipschitz over a trajectory
+- [x] Placeholder test passing in CI (`tests/test_placeholder.py`)
+
+## Phase 2 — Perturbation Engine (parallelizable by category)
+> **Prerequisite (sequential):** implement `base.py` first — all parallel categories depend on it.
+> Each category subagent receives: `02_class_design.md` + `05_test_conventions.md` + `06_test_infrastructure.md` + `01_perturbations_catalog.md` (entries for its category only) + `00_feasibility.md` + `00b_sensor_models.md` (cat. 4 only).
+> A subagent's work is DONE only when `uv run pytest tests/category_N_*/` exits 0.
+
+- [x] Base `Perturbation` class + `OUProcess` + `DelayBuffer` + registry (`src/genesis_robust_rl/perturbations/base.py`)
+- [x] **[parallel]** Category 1 — Physics (GenesisSetterPerturbation, ExternalWrenchPerturbation) — 15 perturbations (15/15 done: 1.1–1.15 ✓)
+- [ ] **[parallel]** Category 2 — Motor (MotorCommandPerturbation leaves) — 13 perturbations
+- [ ] **[parallel]** Category 3 — Temporal (ObsDelayBuffer, ActionDelayBuffer) — 8 perturbations
+- [ ] **[parallel]** Category 4 — Sensor (SensorModel + ObservationPerturbation leaves) — 16 perturbations
+- [ ] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9 perturbations
+- [ ] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5 perturbations
+- [ ] **[parallel]** Category 7 — Payload (GenesisSetterPerturbation leaves) — 3 perturbations
+- [ ] **[parallel]** Category 8 — External force/torque (ExternalWrenchPerturbation leaves) — 2 perturbations
 - [ ] Perturbation registry + auto-doc API
-- [ ] Unit tests for all perturbation types
 
 ## Phase 3 — Base Gym Environment
 - [ ] Genesis quadrotor integration
@@ -62,9 +87,27 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [ ] Example notebooks
 - [ ] PyPI release
 
+## Phase 7 — GitHub Pages Site
+- [ ] MkDocs + Material theme setup
+- [ ] `mkdocs.yml` config — nav, theme, plugins
+- [ ] Migrate `docs/impl/` technical docs into MkDocs structure
+- [ ] GitHub Actions workflow: push to `main` → build → deploy to GitHub Pages
+- [ ] Live site at `paul-antoineletolguenec.github.io/genesis-robust-rl`
+
 ---
 
 ## Current milestone
-**Phase 1 — Design** (not started)
+**Phase 2 — Perturbation Engine** — in progress
 
-Next step: write `docs/01_perturbations_catalog.md` (must reference `docs/00_feasibility.md` for every entry).
+**base.py done + audited.** 5 blocking bugs fixed (tick DR guard, update_params Lipschitz, wrench_type dispatch, PerturbationRegistry). Genesis v0.4.0 migration: `scene.solver` → `scene.rigid_solver` in all code + tests.
+Cat 1 : 15/15 done (1.1–1.15 ✓, 741 passed, 234 skipped). 45 PNG generated.
+P6 overhead test added and passing (combined overhead +3.9% < 5% limit, Crazyflie CF2X, n_envs=16).
+
+**Immediate next action:** push → CI check → implement Cat 2–8 in parallel.
+
+**Key design constraints to respect:**
+- `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)
+- Physics perturbations called at step [6] post_physics¹ — see `01_perturbations_catalog.md` §Category 1 note
+- `OUProcess.step()` must use torch ops only (no numpy)
+- `DelayBuffer` uses circular `Tensor[n_envs, max_delay, dim]` — no Python deque
+- `tick(is_reset, env_ids=None)` — env_ids is optional (None = all envs)

@@ -5,6 +5,7 @@ description = "Robust RL wrapper for quadrotor drones using Genesis simulator"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "genesis-world>=0.4.0",
     "gymnasium>=0.29",
     "numpy>=1.24",
     "scipy>=1.11",
@@ -15,6 +16,9 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.4",
+    "torch>=2.0",
+    "plotly>=5.0",
+    "kaleido>=0.2",
 ]
 genesis = [
     "genesis-world>=0.2",
@@ -36,3 +40,25 @@ select = ["E", "F", "I"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--tb=short -m 'not perf and not genesis'"
+markers = [
+    "unit: unit tests — no Genesis, mocked EnvState (fast, CPU-only)",
+    "integration: integration tests — real EnvState, mocked Genesis scene",
+    "perf: performance tests — GPU required, n_envs=512",
+    "genesis: requires real Genesis runtime (GPU/EGL) — run locally only",
+]
+
+[tool.coverage.run]
+source = ["src/genesis_robust_rl"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+# fail_under = 80  # re-enable after Phase 2 is complete (all category tests present)
+fail_under = 0
+show_missing = true
+
+[dependency-groups]
+dev = [
+    "kaleido>=1.2.0",
+    "plotly>=6.1.1",
+]
