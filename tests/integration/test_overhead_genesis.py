@@ -15,6 +15,7 @@ Thresholds:
 Uses a real Crazyflie CF2X URDF drone with batched environments.
 Run locally: uv run pytest tests/integration/test_overhead_genesis.py -v -s
 """
+
 from __future__ import annotations
 
 import logging
@@ -32,9 +33,7 @@ try:
 except ImportError:
     _GENESIS_AVAILABLE = False
 
-pytestmark = pytest.mark.skipif(
-    not _GENESIS_AVAILABLE, reason="Genesis not installed"
-)
+pytestmark = pytest.mark.skipif(not _GENESIS_AVAILABLE, reason="Genesis not installed")
 
 logger = logging.getLogger(__name__)
 
@@ -115,21 +114,25 @@ def all_perturbations(genesis_env):
 
     # Setter-based perturbations use real Genesis setters where available,
     # no-op lambdas where the CF2X doesn't expose the setter
-    noop = lambda v, idx: None
+    def noop(v, idx):  # noqa: ARG001
+        return None
 
     return {
         "MassShift": MassShift(
             setter_fn=lambda v, idx: drone.set_mass_shift(v, idx),
-            n_envs=n, dt=dt,
+            n_envs=n,
+            dt=dt,
         ),
         "COMShift": COMShift(
             setter_fn=lambda v, idx: drone.set_COM_shift(v, idx),
-            n_envs=n, dt=dt,
+            n_envs=n,
+            dt=dt,
         ),
         "InertiaTensor": InertiaTensor(
             mass_setter_fn=lambda v, idx: drone.set_mass_shift(v, idx),
             com_setter_fn=lambda v, idx: drone.set_COM_shift(v, idx),
-            n_envs=n, dt=dt,
+            n_envs=n,
+            dt=dt,
         ),
         "MotorArmature": MotorArmature(setter_fn=noop, n_envs=n, dt=dt),
         "FrictionRatio": FrictionRatio(setter_fn=noop, n_envs=n, dt=dt),
@@ -142,7 +145,8 @@ def all_perturbations(genesis_env):
         "ChassisGeometryAsymmetry": ChassisGeometryAsymmetry(
             mass_setter_fn=lambda v, idx: drone.set_mass_shift(v, idx),
             com_setter_fn=lambda v, idx: drone.set_COM_shift(v, idx),
-            n_envs=n, dt=dt,
+            n_envs=n,
+            dt=dt,
         ),
         "PropellerBladeDamage": PropellerBladeDamage(n_envs=n, dt=dt),
         "StructuralFlexibility": StructuralFlexibility(n_envs=n, dt=dt),
@@ -221,7 +225,7 @@ def test_perturbation_overhead(genesis_env, env_state, all_perturbations, name):
     delta_us = (t_pert - t_base) * 1e6
 
     print(
-        f"\n  {name}: base={t_base*1e6:.0f}µs  pert={t_pert*1e6:.0f}µs  "
+        f"\n  {name}: base={t_base * 1e6:.0f}µs  pert={t_pert * 1e6:.0f}µs  "
         f"delta={delta_us:.0f}µs  overhead={overhead_pct:+.1f}%"
     )
 
@@ -229,7 +233,7 @@ def test_perturbation_overhead(genesis_env, env_state, all_perturbations, name):
     if overhead > MAX_OVERHEAD_WARN:
         warnings.warn(
             f"{name}: overhead {overhead_pct:.1f}% exceeds 100% warning threshold "
-            f"(base={t_base*1e6:.0f}µs, delta={delta_us:.0f}µs). "
+            f"(base={t_base * 1e6:.0f}µs, delta={delta_us:.0f}µs). "
             f"Consider optimizing _compute_wrench() or pre-allocating tensors.",
             UserWarning,
             stacklevel=1,
@@ -238,7 +242,7 @@ def test_perturbation_overhead(genesis_env, env_state, all_perturbations, name):
     # Hard fail at 200%
     assert overhead < MAX_OVERHEAD_FAIL, (
         f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit "
-        f"(base={t_base*1e6:.0f}µs, pert={t_pert*1e6:.0f}µs, delta={delta_us:.0f}µs)"
+        f"(base={t_base * 1e6:.0f}µs, pert={t_pert * 1e6:.0f}µs, delta={delta_us:.0f}µs)"
     )
 
 
@@ -251,12 +255,12 @@ def test_overhead_summary(genesis_env, env_state, all_perturbations):
 
     t_base = _measure_median(scene, lambda: scene.step())
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"  Cat 1 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
-    print(f"  Baseline: {t_base*1e6:.0f} µs/step")
-    print(f"{'='*70}")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
     print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
-    print(f"  {'-'*28} {'-'*8} {'-'*8} {'-'*10}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
 
     warn_count = 0
     for name in PERTURBATION_NAMES:
@@ -268,17 +272,18 @@ def test_overhead_summary(genesis_env, env_state, all_perturbations):
                 pert.tick(is_reset=False)
                 pert.apply(scene, drone, env_state)
                 scene.step()
+
             return loop
 
         t_p = _measure_median(scene, make_loop(p))
         overhead = (t_p - t_base) / t_base * 100
         delta = (t_p - t_base) * 1e6
         flag = " ⚠" if overhead > 100 else ""
-        print(f"  {name:<28s} {t_p*1e6:>7.0f}µs {delta:>+7.0f}µs {overhead:>+9.1f}%{flag}")
+        print(f"  {name:<28s} {t_p * 1e6:>7.0f}µs {delta:>+7.0f}µs {overhead:>+9.1f}%{flag}")
         if overhead > 100:
             warn_count += 1
 
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     if warn_count:
         print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold")
     print()

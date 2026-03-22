@@ -4,17 +4,18 @@ Covers: U1–U11 unit tests, I1–I2 integration tests.
 MassShift is stateless + per_episode → U8/U10 are skipped automatically.
 InertiaTensor uses two setters (mass + CoM) — tested in I2b.
 """
+
+from unittest.mock import MagicMock, patch
+
 import pytest
 import torch
-from unittest.mock import patch, MagicMock
 
 from genesis_robust_rl.perturbations.base import (
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import InertiaTensor
 from tests.conftest import assert_lipschitz
-
 
 # ---------------------------------------------------------------------------
 # U1 — sample() output within bounds (1000 draws)
@@ -272,6 +273,7 @@ def test_inertia_tensor_both_setters_called(n_envs: int, mock_env_state) -> None
     p.tick(is_reset=True)
     # Build an env_state with the right n_envs
     from tests.conftest import EnvState
+
     env_state = EnvState(
         pos=torch.zeros(n_envs, 3),
         quat=torch.tensor([[1.0, 0.0, 0.0, 0.0]]).expand(n_envs, -1),

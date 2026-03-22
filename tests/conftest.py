@@ -1,4 +1,5 @@
 """Shared fixtures for all test categories. Never modify this file in Phase 2+."""
+
 from dataclasses import dataclass
 from unittest.mock import MagicMock
 
@@ -12,12 +13,12 @@ torch.manual_seed(42)  # deterministic fixture data — prevents flaky tests
 
 @dataclass
 class EnvState:
-    pos: torch.Tensor      # [n_envs, 3]
-    quat: torch.Tensor     # [n_envs, 4]  (w, x, y, z)
-    vel: torch.Tensor      # [n_envs, 3]
+    pos: torch.Tensor  # [n_envs, 3]
+    quat: torch.Tensor  # [n_envs, 4]  (w, x, y, z)
+    vel: torch.Tensor  # [n_envs, 3]
     ang_vel: torch.Tensor  # [n_envs, 3]
-    acc: torch.Tensor      # [n_envs, 3]
-    rpm: torch.Tensor      # [n_envs, 4]
+    acc: torch.Tensor  # [n_envs, 3]
+    rpm: torch.Tensor  # [n_envs, 4]
     dt: float
     step: int
 
@@ -88,9 +89,7 @@ def assert_lipschitz(perturbation, n_steps: int) -> None:
         perturbation.set_value(candidate)
         current = perturbation._current_value
         delta = (current - prev).abs().max().item()
-        assert delta <= k * dt + 1e-6, (
-            f"Lipschitz violated: delta={delta:.6f} > k*dt={k * dt:.6f}"
-        )
+        assert delta <= k * dt + 1e-6, f"Lipschitz violated: delta={delta:.6f} > k*dt={k * dt:.6f}"
         prev = current.clone()
 
 

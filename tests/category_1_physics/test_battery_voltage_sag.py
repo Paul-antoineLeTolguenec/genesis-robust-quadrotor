@@ -4,20 +4,20 @@ Covers U1–U11, I1, I3. Stateful, per_step, per_env, dimension=() (scalar).
 State: soc[n_envs] + discharge_rate[n_envs].
 U2/U8 tests adapted for stateful nature (call tick before sampling).
 """
+
 import time
+from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
-from unittest.mock import MagicMock, patch
 
 from genesis_robust_rl.perturbations.base import (
     ExternalWrenchPerturbation,
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import BatteryVoltageSag
-from tests.conftest import assert_lipschitz, EnvState
-
+from tests.conftest import EnvState, assert_lipschitz
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -213,7 +213,6 @@ def test_stateful_reset_all(perturbation, n_envs):
     perturbation.tick(is_reset=True)
     for _ in range(5):
         perturbation.tick(is_reset=False)
-    soc_before = perturbation._soc.clone()
     perturbation.reset(env_ids)
     # SoC should be resampled (different from depleted value)
     # Just verify it does not raise and stays in valid range
@@ -300,9 +299,7 @@ def test_force_shape(perturbation, mock_scene, mock_env_state, n_envs):
     perturbation.apply(mock_scene, mock_scene.drone, mock_env_state)
     call_args = mock_scene.rigid_solver.apply_links_external_force.call_args[0]
     force_arg = call_args[0]
-    assert force_arg.shape == (n_envs, 3), (
-        f"Expected ({n_envs}, 3), got {force_arg.shape}"
-    )
+    assert force_arg.shape == (n_envs, 3), f"Expected ({n_envs}, 3), got {force_arg.shape}"
 
 
 @pytest.mark.integration
@@ -349,8 +346,10 @@ def test_soc_decreases_monotonically(n_envs):
         n_envs=n_envs,
         dt=0.01,
         distribution_params={
-            "low": 0.8, "high": 1.0,
-            "discharge_rate_low": 0.01, "discharge_rate_high": 0.01,
+            "low": 0.8,
+            "high": 1.0,
+            "discharge_rate_low": 0.01,
+            "discharge_rate_high": 0.01,
         },
         curriculum_scale=1.0,
     )

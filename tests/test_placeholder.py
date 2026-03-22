@@ -1,4 +1,5 @@
 """Placeholder test — validates CI test harness setup. Remove after Phase 2 is complete."""
+
 import pytest
 
 
@@ -22,4 +23,4 @@ def test_genesis_robust_rl_importable():
     try:
         import genesis_robust_rl  # noqa: F401
     except ImportError as e:
-        pytest.fail(f"genesis_robust_rl not importable — run `uv sync --extra dev` before testing: {e}")
+        pytest.fail(f"genesis_robust_rl not importable — run `uv sync --extra dev`: {e}")

@@ -1,8 +1,8 @@
 """Fixtures for category 1 — physics perturbations."""
+
 import pytest
 
 from genesis_robust_rl.perturbations.category_1_physics import (
-    AeroDragCoeff,
     BatteryVoltageSag,
     ChassisGeometryAsymmetry,
     COMShift,
@@ -30,10 +30,18 @@ from genesis_robust_rl.perturbations.category_1_physics import (
             dt=0.01,
         ),
         lambda n, scene: MotorArmature(setter_fn=scene.drone.set_dofs_armature, n_envs=n, dt=0.01),
-        lambda n, scene: FrictionRatio(setter_fn=scene.drone.set_geoms_friction_ratio, n_envs=n, dt=0.01),
+        lambda n, scene: FrictionRatio(
+            setter_fn=scene.drone.set_geoms_friction_ratio,
+            n_envs=n,
+            dt=0.01,
+        ),
         lambda n, scene: PositionGainKp(setter_fn=scene.drone.set_dofs_kp, n_envs=n, dt=0.01),
         lambda n, scene: VelocityGainKv(setter_fn=scene.drone.set_dofs_kv, n_envs=n, dt=0.01),
-        lambda n, scene: JointStiffness(setter_fn=scene.drone.set_dofs_stiffness, n_envs=n, dt=0.01),
+        lambda n, scene: JointStiffness(
+            setter_fn=scene.drone.set_dofs_stiffness,
+            n_envs=n,
+            dt=0.01,
+        ),
         lambda n, scene: JointDamping(setter_fn=scene.drone.set_dofs_damping, n_envs=n, dt=0.01),
         lambda n, scene: ChassisGeometryAsymmetry(
             mass_setter_fn=scene.drone.set_links_mass_shift,

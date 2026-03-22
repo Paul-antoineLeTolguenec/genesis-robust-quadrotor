@@ -10,13 +10,14 @@ Implemented perturbations:
   1.7  VelocityGainKv            — per-env DOF velocity gain via set_dofs_kv()
   1.8  JointStiffness            — per-env DOF joint stiffness via set_dofs_stiffness()
   1.9  JointDamping              — per-env DOF joint damping via set_dofs_damping()
-  1.10 AeroDragCoeff             — per-env aerodynamic drag coefficient via apply_links_external_force()
-  1.11 GroundEffect              — per-env Cheeseman-Bennett thrust augmentation via apply_links_external_force()
-  1.12 ChassisGeometryAsymmetry  — per-env arm-length deviations propagated as CoM + mass shifts
-  1.13 PropellerBladeDamage      — per-env blade efficiency loss via net thrust correction force
-  1.14 StructuralFlexibility     — per-env spring-damper residual torque via apply_links_external_torque()
-  1.15 BatteryVoltageSag         — stateful per-env SoC depletion → KF scaling via thrust correction force
+  1.10 AeroDragCoeff             — per-env aero drag via external force
+  1.11 GroundEffect              — per-env Cheeseman-Bennett thrust augmentation
+  1.12 ChassisGeometryAsymmetry  — per-env arm-length deviations (CoM + mass)
+  1.13 PropellerBladeDamage      — per-env blade efficiency loss (thrust correction)
+  1.14 StructuralFlexibility     — per-env spring-damper residual torque
+  1.15 BatteryVoltageSag         — stateful SoC depletion → KF scaling
 """
+
 from __future__ import annotations
 
 import math
@@ -602,7 +603,7 @@ class AeroDragCoeff(ExternalWrenchPerturbation):
         distribution_params: {"low", "high"} for uniform; {"mean", "std"} for gaussian.
         bounds: hard clamp [min_multiplier, max_multiplier] on the Cd scaling factor.
         nominal: unperturbed Cd multiplier per axis ([1.0, 1.0, 1.0]).
-        lipschitz_k: max |delta_multiplier| per step in adversarial dynamic mode (None = per_episode).
+        lipschitz_k: max |delta_multiplier| per step in adversarial mode.
         frame: "world" or "local" — reference frame for the force application.
         link_idx: index of the drone body link (default 0).
         duration_mode: "continuous" or "pulse".
@@ -757,8 +758,8 @@ class GroundEffect(ExternalWrenchPerturbation):
         h_safe = h.clamp(min=R / 2.0)
 
         # Cheeseman-Bennett multiplier
-        ratio = R / (4.0 * h_safe)          # [n_envs]
-        k_ge = 1.0 / (1.0 - ratio.pow(2))   # [n_envs]
+        ratio = R / (4.0 * h_safe)  # [n_envs]
+        k_ge = 1.0 / (1.0 - ratio.pow(2))  # [n_envs]
 
         # Clamp to physical range [1, max_k_ge] — no negative effect, cap singularity
         k_ge = k_ge.clamp(1.0, self._max_k_ge)
@@ -873,16 +874,14 @@ class ChassisGeometryAsymmetry(PhysicsPerturbation):
         envs_idx = torch.arange(self.n_envs, device=deviations.device)
 
         angles = self._ARM_ANGLES.to(deviations.device)  # [4]
-        cos_x = torch.cos(angles)                         # [4]
-        cos_y = torch.cos(angles + math.pi / 2)           # [4] = -sin(angles)
+        cos_x = torch.cos(angles)  # [4]
+        cos_y = torch.cos(angles + math.pi / 2)  # [4] = -sin(angles)
 
         # Planar CoM shift: [n_envs, 4] @ [4] → [n_envs] / n_arms
         delta_x = (deviations * cos_x).sum(dim=1) / 4.0  # [n_envs]
         delta_y = (deviations * cos_y).sum(dim=1) / 4.0  # [n_envs]
 
-        delta_com = torch.stack(
-            [delta_x, delta_y, torch.zeros_like(delta_x)], dim=1
-        )  # [n_envs, 3]
+        delta_com = torch.stack([delta_x, delta_y, torch.zeros_like(delta_x)], dim=1)  # [n_envs, 3]
 
         # Arm deviations do not change mass (geometry only)
         delta_m = torch.zeros(self.n_envs, dtype=torch.float32, device=deviations.device)
@@ -1070,8 +1069,8 @@ class StructuralFlexibility(ExternalWrenchPerturbation):
         """Draw [k, b] independently from their respective uniform ranges."""
         p = self.distribution_params
         n = self.n_envs
-        k = torch.empty(n).uniform_(p["k_low"], p["k_high"])   # [n_envs]
-        b = torch.empty(n).uniform_(p["b_low"], p["b_high"])   # [n_envs]
+        k = torch.empty(n).uniform_(p["k_low"], p["k_high"])  # [n_envs]
+        b = torch.empty(n).uniform_(p["b_low"], p["b_high"])  # [n_envs]
         return torch.stack([k, b], dim=1)  # [n_envs, 2]
 
     def _compute_wrench(self, env_state: EnvState) -> Tensor:
@@ -1083,9 +1082,9 @@ class StructuralFlexibility(ExternalWrenchPerturbation):
         assert self._current_value is not None, "call tick() before apply()"
         k = self._current_value[:, 0].unsqueeze(1)  # [n_envs, 1]
         b = self._current_value[:, 1].unsqueeze(1)  # [n_envs, 1]
-        ang_vel = env_state.ang_vel                  # [n_envs, 3]
-        theta = ang_vel * self.dt                    # first-order angular deformation
-        return -(k * theta + b * ang_vel)            # [n_envs, 3]
+        ang_vel = env_state.ang_vel  # [n_envs, 3]
+        theta = ang_vel * self.dt  # first-order angular deformation
+        return -(k * theta + b * ang_vel)  # [n_envs, 3]
 
     def apply(self, scene: Any, drone: Any, env_state: EnvState) -> None:
         """Apply spring-damper torque via apply_links_external_torque.
@@ -1205,14 +1204,10 @@ class BatteryVoltageSag(ExternalWrenchPerturbation):
 
         # SoC: curriculum_scale compresses toward nominal (1.0 = full charge)
         soc_raw = torch.empty(n).uniform_(p["low"], p["high"])
-        self._soc[env_ids] = (
-            1.0 + (soc_raw - 1.0) * self.curriculum_scale
-        ).clamp(0.0, 1.0)
+        self._soc[env_ids] = (1.0 + (soc_raw - 1.0) * self.curriculum_scale).clamp(0.0, 1.0)
 
         # Discharge rate: curriculum_scale compresses toward 0 (no discharge)
-        dr_raw = torch.empty(n).uniform_(
-            p["discharge_rate_low"], p["discharge_rate_high"]
-        )
+        dr_raw = torch.empty(n).uniform_(p["discharge_rate_low"], p["discharge_rate_high"])
         self._discharge_rate[env_ids] = (dr_raw * self.curriculum_scale).clamp(
             0.0, p["discharge_rate_high"]
         )
@@ -1243,7 +1238,7 @@ class BatteryVoltageSag(ExternalWrenchPerturbation):
         """
         assert self._current_value is not None, "call tick() before apply()"
         vr = self._current_value  # [n_envs] voltage_ratio
-        rpm = env_state.rpm       # [n_envs, 4]
+        rpm = env_state.rpm  # [n_envs, 4]
 
         # (v_ratio^2 - 1) < 0 for vr < 1 — negative thrust correction (sag reduces thrust)
         delta_per_prop = (vr.pow(2).unsqueeze(1) - 1.0) * self._KF * rpm.pow(2)  # [n_envs, 4]

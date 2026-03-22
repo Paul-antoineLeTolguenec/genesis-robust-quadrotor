@@ -3,13 +3,15 @@
 Measures tick() + apply() overhead at n_envs=1 and n_envs=512.
 Fails if overhead exceeds defined thresholds.
 """
+
 import time
 from typing import Callable
+from unittest.mock import MagicMock
 
 import pytest
 import torch
-from unittest.mock import MagicMock
 
+from genesis_robust_rl.perturbations.base import Perturbation
 from genesis_robust_rl.perturbations.category_1_physics import (
     COMShift,
     InertiaTensor,
@@ -20,14 +22,13 @@ from genesis_robust_rl.perturbations.category_1_physics import (
     PositionGainKp,
     VelocityGainKv,
 )
-from genesis_robust_rl.perturbations.base import Perturbation
 from tests.conftest import EnvState
 
 WARMUP = 200
 STEPS = 2000
 
 # Thresholds (CPU, no Genesis)
-MAX_TICK_MS_PER_STEP = 0.1   # tick() budget: sampling + curriculum scaling
+MAX_TICK_MS_PER_STEP = 0.1  # tick() budget: sampling + curriculum scaling
 MAX_APPLY_MS_PER_STEP = 0.05  # apply() budget: setter dispatch only
 
 
@@ -40,7 +41,12 @@ def _make_com_shift(n_envs: int) -> COMShift:
 
 
 def _make_inertia_tensor(n_envs: int) -> InertiaTensor:
-    return InertiaTensor(mass_setter_fn=MagicMock(), com_setter_fn=MagicMock(), n_envs=n_envs, dt=0.01)
+    return InertiaTensor(
+        mass_setter_fn=MagicMock(),
+        com_setter_fn=MagicMock(),
+        n_envs=n_envs,
+        dt=0.01,
+    )
 
 
 def _make_motor_armature(n_envs: int) -> MotorArmature:

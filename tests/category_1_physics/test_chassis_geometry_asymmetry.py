@@ -3,21 +3,20 @@
 Covers U1–U11, I1, I3 (PhysicsPerturbation with dual setters), P1.
 The perturbation is stateless, per_episode, per_env, dimension=(4,).
 """
+
 import math
 import time
+from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
-from unittest.mock import MagicMock, patch
 
 from genesis_robust_rl.perturbations.base import (
-    ExternalWrenchPerturbation,
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import ChassisGeometryAsymmetry
-from tests.conftest import assert_lipschitz, EnvState
-
+from tests.conftest import EnvState, assert_lipschitz
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -425,7 +424,7 @@ def test_apply_overhead() -> None:
     )
     p.tick(is_reset=True)
 
-    env_state = EnvState(
+    _env_state = EnvState(
         pos=torch.zeros(PERF_N_ENVS, 3, device="cuda"),
         quat=torch.tensor([[1.0, 0.0, 0.0, 0.0]], device="cuda").expand(PERF_N_ENVS, -1),
         vel=torch.zeros(PERF_N_ENVS, 3, device="cuda"),

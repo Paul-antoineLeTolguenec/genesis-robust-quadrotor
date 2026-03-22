@@ -3,18 +3,19 @@
 Covers U1–U11, I1, I3. Stateless, per_episode, per_env, dimension=(4,).
 Supports uniform and beta distributions.
 """
+
+from unittest.mock import MagicMock, patch
+
 import pytest
 import torch
-from unittest.mock import MagicMock, patch
 
 from genesis_robust_rl.perturbations.base import (
     ExternalWrenchPerturbation,
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import PropellerBladeDamage
-from tests.conftest import assert_lipschitz, EnvState
-
+from tests.conftest import EnvState, assert_lipschitz
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -329,6 +330,7 @@ def test_tick_overhead_cpu(n_envs: int) -> None:
     for _ in range(WARMUP):
         p.tick(is_reset=True)
     import time
+
     start = time.perf_counter()
     for _ in range(STEPS):
         p.tick(is_reset=True)
@@ -344,6 +346,7 @@ def test_tick_overhead_cpu(n_envs: int) -> None:
 def test_apply_overhead_cpu(n_envs: int) -> None:
     """PropellerBladeDamage apply() must stay under MAX_APPLY_MS on CPU."""
     import time
+
     scene = MagicMock()
     scene.rigid_solver.apply_links_external_force = MagicMock()
     p = PropellerBladeDamage(n_envs=n_envs, dt=0.01)

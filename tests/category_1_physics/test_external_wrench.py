@@ -3,20 +3,20 @@
 Covers: U1–U11 unit tests, I1, I3 integration tests, P1 performance test.
 AeroDragCoeff is stateless + per_episode → U8/U10 are skipped automatically.
 """
+
 import time
+from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
-from unittest.mock import patch, MagicMock
 
 from genesis_robust_rl.perturbations.base import (
     ExternalWrenchPerturbation,
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import AeroDragCoeff, GroundEffect
-from tests.conftest import assert_lipschitz, EnvState
-
+from tests.conftest import EnvState, assert_lipschitz
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -374,8 +374,6 @@ def test_apply_overhead() -> None:
     scene = MagicMock()
     scene.rigid_solver = MagicMock()
     scene.rigid_solver.apply_links_external_force = MagicMock()
-    drone = MagicMock()
-
     # Warmup
     for _ in range(PERF_WARMUP):
         p._compute_wrench(env_state)
@@ -717,8 +715,8 @@ def test_ge_force_monotonically_decreasing_with_altitude(n_envs: int) -> None:
     # Each subsequent force should be <= previous
     for i in range(len(forces) - 1):
         assert forces[i] >= forces[i + 1] - 1e-6, (
-            f"Force not monotonically decreasing: alt={altitudes[i]:.2f}→{altitudes[i+1]:.2f}, "
-            f"F={forces[i]:.4f}→{forces[i+1]:.4f}"
+            f"Force not monotonically decreasing: alt={altitudes[i]:.2f}→{altitudes[i + 1]:.2f}, "
+            f"F={forces[i]:.4f}→{forces[i + 1]:.4f}"
         )
 
 

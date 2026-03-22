@@ -4,20 +4,19 @@ Covers U1–U11, I1, I3. Stateless, per_episode, per_env, dimension=(2,).
 Custom _draw() samples [k, b] independently from separate uniform ranges.
 apply() calls apply_links_external_torque (not force).
 """
+
 import time
+from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
-from unittest.mock import MagicMock, patch
 
 from genesis_robust_rl.perturbations.base import (
-    ExternalWrenchPerturbation,
-    PhysicsPerturbation,
     PerturbationMode,
+    PhysicsPerturbation,
 )
 from genesis_robust_rl.perturbations.category_1_physics import StructuralFlexibility
-from tests.conftest import assert_lipschitz, EnvState
-
+from tests.conftest import EnvState, assert_lipschitz
 
 # ---------------------------------------------------------------------------
 # Fixtures

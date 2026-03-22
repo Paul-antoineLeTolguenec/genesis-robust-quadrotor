@@ -10,6 +10,7 @@ Hierarchy:
     ObservationPerturbation (ABC)  — apply(obs) -> obs
     ActionPerturbation (ABC)       — apply(action) -> action
 """
+
 from __future__ import annotations
 
 import math
@@ -21,7 +22,6 @@ from typing import Any, Callable, Literal
 import torch
 from torch import Tensor
 
-
 # ---------------------------------------------------------------------------
 # Shared data structure
 # ---------------------------------------------------------------------------
@@ -31,12 +31,12 @@ from torch import Tensor
 class EnvState:
     """Drone state snapshot passed to physics hooks at each env step."""
 
-    pos: Tensor      # [n_envs, 3]  world position (m)
-    quat: Tensor     # [n_envs, 4]  orientation quaternion (w, x, y, z)
-    vel: Tensor      # [n_envs, 3]  body linear velocity (m/s)
+    pos: Tensor  # [n_envs, 3]  world position (m)
+    quat: Tensor  # [n_envs, 4]  orientation quaternion (w, x, y, z)
+    vel: Tensor  # [n_envs, 3]  body linear velocity (m/s)
     ang_vel: Tensor  # [n_envs, 3]  body angular velocity (rad/s)
-    acc: Tensor      # [n_envs, 3]  body linear acceleration (m/s²)
-    rpm: Tensor      # [n_envs, 4]  propeller RPM
+    acc: Tensor  # [n_envs, 3]  body linear acceleration (m/s²)
+    rpm: Tensor  # [n_envs, 4]  propeller RPM
     dt: float
     step: int
 
@@ -118,6 +118,7 @@ class DelayBuffer:
 # Registry
 # ---------------------------------------------------------------------------
 
+
 class PerturbationRegistry:
     """Config-driven perturbation instantiation utility.
 
@@ -131,12 +132,14 @@ class PerturbationRegistry:
 
     def register(self, id: str) -> Callable[[type], type]:
         """Decorator: register a Perturbation subclass under its catalog id."""
+
         def decorator(cls: type) -> type:
             if id in self._registry:
                 raise ValueError(f"Duplicate registry key: {id!r}")
             self._registry[id] = cls
             cls._registry_id = id  # type: ignore[attr-defined]
             return cls
+
         return decorator
 
     def get(self, id: str) -> type["Perturbation"]:
@@ -253,10 +256,7 @@ class Perturbation(ABC):
             ):
                 self.sample()
         else:
-            if (
-                self.mode == PerturbationMode.DOMAIN_RANDOMIZATION
-                and self.frequency == "per_step"
-            ):
+            if self.mode == PerturbationMode.DOMAIN_RANDOMIZATION and self.frequency == "per_step":
                 self.sample()
             if self.is_stateful:
                 self.step()
@@ -390,9 +390,19 @@ class ExternalWrenchPerturbation(PhysicsPerturbation, ABC):
         local = self.frame == "local"
         envs_idx = torch.arange(self.n_envs)
         if self.wrench_type == "torque":
-            scene.rigid_solver.apply_links_external_torque(wrench, self.link_idx, envs_idx, local=local)
+            scene.rigid_solver.apply_links_external_torque(
+                wrench,
+                self.link_idx,
+                envs_idx,
+                local=local,
+            )
         else:
-            scene.rigid_solver.apply_links_external_force(wrench, self.link_idx, envs_idx, local=local)
+            scene.rigid_solver.apply_links_external_force(
+                wrench,
+                self.link_idx,
+                envs_idx,
+                local=local,
+            )
 
 
 class MotorCommandPerturbation(Perturbation, ABC):
