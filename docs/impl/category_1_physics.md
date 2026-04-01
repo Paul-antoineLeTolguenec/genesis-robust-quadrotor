@@ -129,19 +129,20 @@ mass_shift.set_value(delta_m_tensor)  # Lipschitz-clipped if lipschitz_k set
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-Measured on CPU (no Genesis), 2000 steps after 200 warmup steps.
-Thresholds enforced by `tests/category_1_physics/test_perf_physics.py`.
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | +2.6% ✅ |
+| P6 status | PASS |
 
 ![perf overhead](assets/cat1_mass_shift_perf.png)
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -269,19 +270,20 @@ com_shift.set_value(delta_r_tensor)  # Lipschitz-clipped if lipschitz_k set
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-Measured on CPU (no Genesis), 2000 steps after 200 warmup steps.
-Thresholds enforced by `tests/category_1_physics/test_perf_physics.py`.
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | +1.7% ✅ |
+| P6 status | PASS |
 
 ![perf overhead](assets/cat1_com_shift_perf.png)
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -419,19 +421,23 @@ inertia.apply(scene, drone, state) # injects Δm + Δr into Genesis
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-Measured on CPU (no Genesis), 2000 steps after 200 warmup steps.
-Thresholds enforced by `tests/category_1_physics/test_perf_physics.py`.
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | +103% ⚠️ |
+| P6 status | PASS (WARNING) |
+
+> InertiaTensor requires both `set_links_mass_shift` + `set_links_COM_shift` calls,
+> doubling the Genesis API cost. Overhead decreases with higher n_envs.
 
 ![perf overhead](assets/cat1_inertia_tensor_perf.png)
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -571,19 +577,20 @@ motor_armature.apply(scene, drone, state) # injects into Genesis (triggers recom
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-Measured on CPU (no Genesis), 2000 steps after 200 warmup steps.
-Thresholds enforced by `tests/category_1_physics/test_perf_physics.py`.
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
 ![perf overhead](assets/cat1_motor_armature_perf.png)
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -686,16 +693,20 @@ ratio at every episode reset, creating diverse surface conditions across the bat
 
 ---
 
-### Performance overhead
+### Performance overhead vs n_envs
 
-| Operation | Threshold | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
 ![perf overhead](assets/cat1_friction_ratio_perf.png)
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -794,6 +805,23 @@ bounds $[0.5,\, 2.0]$, `frequency="per_episode"`.
 
 ---
 
+### Performance overhead vs n_envs
+
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
+
+![perf overhead](assets/cat1_position_gain_kp_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
+
+---
+
 ## 1.7 VelocityGainKv
 
 ### Description
@@ -839,6 +867,23 @@ Same curriculum formula as 1.6.
 | `feasibility_ref` | §2 |
 | `risk` | low |
 | `priority` | 2 |
+
+---
+
+### Performance overhead vs n_envs
+
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
+
+![perf overhead](assets/cat1_velocity_gain_kv_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -888,6 +933,23 @@ $$
 
 ---
 
+### Performance overhead vs n_envs
+
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
+
+![perf overhead](assets/cat1_joint_stiffness_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
+
+---
+
 ## 1.9 JointDamping
 
 ### Description
@@ -931,6 +993,23 @@ $$
 | `feasibility_ref` | §2 |
 | `risk` | low |
 | `priority` | 2 |
+
+---
+
+### Performance overhead vs n_envs
+
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
+
+![perf overhead](assets/cat1_joint_damping_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1007,6 +1086,23 @@ $\mathbf{C}_d^\text{nom} = [0.1,\, 0.1,\, 0.1]\ \text{N·s}^2/\text{m}^2$.
 | `feasibility_ref` | §2 |
 | `risk` | low |
 | `priority` | 2 |
+
+---
+
+### Performance overhead vs n_envs
+
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | +2.7% ✅ |
+| P6 status | PASS |
+
+![perf overhead](assets/cat1_aero_drag_coeff_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1105,10 +1201,20 @@ as a function of altitude across a batch of 16 environments.
 
 ### Performance overhead vs n_envs
 
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
+
 The Cheeseman-Bennett model is a set of vectorized torch operations (clamp, pow, div, zeros).
-Overhead is O(n_envs) and sub-millisecond at n_envs=512.
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
 ![perf overhead](assets/cat1_ground_effect_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1235,10 +1341,22 @@ shifts across the batch. The plot shows the 2D CoM shift (Δx, Δy) distribution
 
 ### Performance overhead vs n_envs
 
-The CoM computation is a set of vectorized torch operations (matmul, sum, stack).
-Overhead is O(n_envs) and sub-millisecond at n_envs=512.
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-![perf overhead](assets/cat1_chassis_geometry_perf.png)
+The CoM computation is a set of vectorized torch operations (matmul, sum, stack).
+
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | +110% ⚠️ |
+| P6 status | PASS (WARNING) |
+
+> ChassisGeometryAsymmetry requires both mass + CoM setters. Overhead decreases with higher n_envs.
+
+![perf overhead](assets/cat1_chassis_asymmetry_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1338,16 +1456,20 @@ Compresses efficiency ratios toward nominal [1, 1, 1, 1] as curriculum_scale dec
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-![perf](assets/cat1_blade_damage_perf.png)
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+![perf overhead](assets/cat1_blade_damage_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1444,16 +1566,20 @@ At scale=0: k=0, b=0 → zero torque (rigid body). At scale=1: full stiffness/da
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-![perf](assets/cat1_structural_flexibility_perf.png)
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+![perf overhead](assets/cat1_structural_flexibility_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 
@@ -1568,16 +1694,20 @@ At scale=0: SoC reset to 1.0 → v_ratio=1.0 (no sag). At scale=1: SoC from [0.5
 
 ---
 
-### Performance
+### Performance overhead vs n_envs
 
-| Operation | Limit | n_envs=1 | n_envs=512 |
-|---|---|---|---|
-| `tick()` | < 0.10 ms/step | ✓ | ✓ |
-| `apply()` | < 0.05 ms/step | ✓ | ✓ |
+Measured with real Genesis Crazyflie CF2X (n_envs=16, median of 5 rounds × 100 steps).
+P6 integration test: FAIL >200%, WARNING >100%.
+Enforced by `tests/integration/test_overhead_genesis.py`.
 
-![perf](assets/cat1_battery_voltage_sag_perf.png)
+| Metric | Value |
+|---|---|
+| Overhead (n_envs=16) | < 5% ✅ |
+| P6 status | PASS |
 
-> Regenerate: `uv run python docs/impl/plot_category_1.py`
+![perf overhead](assets/cat1_battery_voltage_sag_perf.png)
+
+> Regenerate: `uv run python docs/impl/plot_category_1_overhead.py`
 
 ---
 

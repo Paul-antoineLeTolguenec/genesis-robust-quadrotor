@@ -46,8 +46,16 @@ Update status when starting (`in_progress`) and when done (`completed`).
 
 ## Phase 2 — Perturbation Engine (parallelizable by category)
 > **Prerequisite (sequential):** implement `base.py` first — all parallel categories depend on it.
-> Each category subagent receives: `02_class_design.md` + `05_test_conventions.md` + `06_test_infrastructure.md` + `01_perturbations_catalog.md` (entries for its category only) + `00_feasibility.md` + `00b_sensor_models.md` (cat. 4 only).
-> A subagent's work is DONE only when `uv run pytest tests/category_N_*/` exits 0.
+>
+> **Pipeline per category (5 phases):**
+> 1. **Implement** (`/implement-category N`) — code + tests + doc + plots (sequential per perturbation)
+> 2. **Review** (3 agents //) — correctness, code quality, perf patterns → fix BLOCKING issues
+> 3. **Measure** — P6 overhead test with real Genesis CF2X → overhead report
+> 4. **Optimize** (`/judge-category N`) — propose optimizations for perturbations >100% overhead
+> 5. **Judge** — synthesis report → user decides which optimizations to apply
+>
+> Phases 1–3 are autonomous. Phases 4–5 require user decisions.
+> A category is DONE when: all tests pass, all BLOCKING fixed, all ❌FAIL optimized under 200%.
 
 - [x] Base `Perturbation` class + `OUProcess` + `DelayBuffer` + registry (`src/genesis_robust_rl/perturbations/base.py`)
 - [x] **[parallel]** Category 1 — Physics (GenesisSetterPerturbation, ExternalWrenchPerturbation) — 15 perturbations (15/15 done: 1.1–1.15 ✓)
