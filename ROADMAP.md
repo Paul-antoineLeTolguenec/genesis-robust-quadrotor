@@ -59,7 +59,7 @@ Update status when starting (`in_progress`) and when done (`completed`).
 
 - [x] Base `Perturbation` class + `OUProcess` + `DelayBuffer` + registry (`src/genesis_robust_rl/perturbations/base.py`)
 - [x] **[parallel]** Category 1 — Physics (GenesisSetterPerturbation, ExternalWrenchPerturbation) — 15 perturbations (15/15 done: 1.1–1.15 ✓)
-- [ ] **[parallel]** Category 2 — Motor (MotorCommandPerturbation leaves) — 13 perturbations
+- [x] **[parallel]** Category 2 — Motor (MotorCommandPerturbation + ExternalWrenchPerturbation leaves) — 13 perturbations (13/13 done: 2.1–2.13 ✓)
 - [ ] **[parallel]** Category 3 — Temporal (ObsDelayBuffer, ActionDelayBuffer) — 8 perturbations
 - [ ] **[parallel]** Category 4 — Sensor (SensorModel + ObservationPerturbation leaves) — 16 perturbations
 - [ ] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9 perturbations
@@ -109,9 +109,10 @@ Update status when starting (`in_progress`) and when done (`completed`).
 
 **base.py done + audited.** 5 blocking bugs fixed (tick DR guard, update_params Lipschitz, wrench_type dispatch, PerturbationRegistry). Genesis v0.4.0 migration: `scene.solver` → `scene.rigid_solver` in all code + tests.
 Cat 1 : 15/15 done (1.1–1.15 ✓, 741 passed, 234 skipped). 45 PNG generated.
-P6 overhead test added and passing (combined overhead +3.9% < 5% limit, Crazyflie CF2X, n_envs=16).
+Cat 2 : 13/13 done (2.1–2.13 ✓, 1322 passed, 358 skipped). 26 PNG generated. 2 review rounds, 3 BLOCKING fixed.
+P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13% (all < 200%, CPU).
 
-**Immediate next action:** push → CI check → implement Cat 2–8 in parallel.
+**Immediate next action:** implement Cat 3–8.
 
 **Key design constraints to respect:**
 - `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)

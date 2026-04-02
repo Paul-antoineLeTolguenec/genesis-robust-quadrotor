@@ -157,6 +157,45 @@ def all_perturbations(genesis_env):
     }
 
 
+@pytest.fixture(scope="module")
+def cat2_perturbations(genesis_env):
+    """Instantiate all 13 Cat 2 perturbations."""
+    from genesis_robust_rl.perturbations.category_2_motor import (
+        GyroscopicEffect,
+        MotorBackEMF,
+        MotorColdStart,
+        MotorKill,
+        MotorLag,
+        MotorPartialFailure,
+        MotorRPMNoise,
+        MotorSaturation,
+        MotorWear,
+        PropellerThrustAsymmetry,
+        RotorImbalance,
+        ThrustCoefficientKF,
+        TorqueCoefficientKM,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "ThrustCoefficientKF": ThrustCoefficientKF(n_envs=n, dt=dt),
+        "TorqueCoefficientKM": TorqueCoefficientKM(n_envs=n, dt=dt),
+        "PropellerThrustAsymmetry": PropellerThrustAsymmetry(n_envs=n, dt=dt),
+        "MotorPartialFailure": MotorPartialFailure(n_envs=n, dt=dt),
+        "MotorKill": MotorKill(n_envs=n, dt=dt),
+        "MotorLag": MotorLag(n_envs=n, dt=dt),
+        "MotorRPMNoise": MotorRPMNoise(n_envs=n, dt=dt),
+        "MotorSaturation": MotorSaturation(n_envs=n, dt=dt),
+        "MotorWear": MotorWear(n_envs=n, dt=dt),
+        "RotorImbalance": RotorImbalance(n_envs=n, dt=dt),
+        "MotorBackEMF": MotorBackEMF(n_envs=n, dt=dt),
+        "MotorColdStart": MotorColdStart(n_envs=n, dt=dt),
+        "GyroscopicEffect": GyroscopicEffect(n_envs=n, dt=dt),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -279,6 +318,174 @@ def test_overhead_summary(genesis_env, env_state, all_perturbations):
             return loop
 
         t_p = _measure_median(scene, make_loop(p))
+        overhead = (t_p - t_base) / t_base * 100
+        delta = (t_p - t_base) * 1e6
+        flag = " ⚠" if overhead > 100 else ""
+        print(f"  {name:<28s} {t_p * 1e6:>7.0f}µs {delta:>+7.0f}µs {overhead:>+9.1f}%{flag}")
+        if overhead > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold")
+    print()
+
+
+# ===========================================================================
+# Category 2 — Motor perturbations
+# ===========================================================================
+
+# Wrench-based Cat 2 (use scene.rigid_solver.apply_links_external_force/torque)
+CAT2_WRENCH_NAMES = [
+    "ThrustCoefficientKF",
+    "TorqueCoefficientKM",
+    "PropellerThrustAsymmetry",
+    "MotorPartialFailure",
+    "MotorBackEMF",
+    "GyroscopicEffect",
+]
+
+# Motor command Cat 2 (transform RPM tensor, no Genesis API call)
+CAT2_MOTOR_CMD_NAMES = [
+    "MotorKill",
+    "MotorLag",
+    "MotorRPMNoise",
+    "MotorSaturation",
+    "MotorWear",
+    "RotorImbalance",
+    "MotorColdStart",
+]
+
+
+@pytest.mark.parametrize("name", CAT2_WRENCH_NAMES)
+def test_cat2_wrench_overhead(genesis_env, env_state, cat2_perturbations, name):
+    """Cat 2 wrench perturbation: tick + apply + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    p = cat2_perturbations[name]
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+    if p.frequency == "per_step":
+        p.tick(is_reset=False)
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(scene, drone, env_state)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat2-wrench] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+
+
+@pytest.mark.parametrize("name", CAT2_MOTOR_CMD_NAMES)
+def test_cat2_motor_cmd_overhead(genesis_env, env_state, cat2_perturbations, name):
+    """Cat 2 motor command perturbation: tick + apply(rpm) + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    p = cat2_perturbations[name]
+    n_envs = genesis_env["n_envs"]
+    rpm_cmd = torch.ones(n_envs, 4) * 14000.0
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+    if p.frequency == "per_step":
+        p.tick(is_reset=False)
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(rpm_cmd)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat2-motor] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+
+
+def test_cat2_overhead_summary(genesis_env, env_state, cat2_perturbations):
+    """Print summary table of all Cat 2 perturbation overheads."""
+    from genesis_robust_rl.perturbations.base import ExternalWrenchPerturbation
+
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    n_envs = genesis_env["n_envs"]
+    rpm_cmd = torch.ones(n_envs, 4) * 14000.0
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 2 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
+    print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
+
+    warn_count = 0
+    all_names = CAT2_WRENCH_NAMES + CAT2_MOTOR_CMD_NAMES
+    for name in all_names:
+        p = cat2_perturbations[name]
+        p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+        if p.frequency == "per_step":
+            p.tick(is_reset=False)
+
+        is_wrench = isinstance(p, ExternalWrenchPerturbation)
+
+        def make_loop(pert, wrench):
+            if wrench:
+
+                def loop():
+                    pert.tick(is_reset=False)
+                    pert.apply(scene, drone, env_state)
+                    scene.step()
+            else:
+
+                def loop():
+                    pert.tick(is_reset=False)
+                    pert.apply(rpm_cmd)
+                    scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_loop(p, is_wrench))
         overhead = (t_p - t_base) / t_base * 100
         delta = (t_p - t_base) * 1e6
         flag = " ⚠" if overhead > 100 else ""
