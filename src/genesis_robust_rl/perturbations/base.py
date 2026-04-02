@@ -372,6 +372,7 @@ class ExternalWrenchPerturbation(PhysicsPerturbation, ABC):
         link_idx: int,
         duration_mode: Literal["continuous", "pulse"],
         wrench_type: Literal["force", "torque"] = "force",
+        preserve_current_value: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -379,6 +380,9 @@ class ExternalWrenchPerturbation(PhysicsPerturbation, ABC):
         self.link_idx = link_idx
         self.duration_mode = duration_mode
         self.wrench_type = wrench_type
+        self._preserve_current_value = preserve_current_value
+        # Pre-allocated buffers for apply()
+        self._envs_idx: Tensor = torch.arange(self.n_envs)
 
     @abstractmethod
     def _compute_wrench(self, env_state: EnvState) -> Tensor:
@@ -386,9 +390,10 @@ class ExternalWrenchPerturbation(PhysicsPerturbation, ABC):
 
     def apply(self, scene: Any, drone: Any, env_state: EnvState) -> None:
         wrench = self._compute_wrench(env_state)
-        self._current_value = wrench
+        if not self._preserve_current_value:
+            self._current_value = wrench
         local = self.frame == "local"
-        envs_idx = torch.arange(self.n_envs)
+        envs_idx = self._envs_idx.to(wrench.device)
         if self.wrench_type == "torque":
             scene.rigid_solver.apply_links_external_torque(
                 wrench,
