@@ -495,5 +495,184 @@ def test_cat2_overhead_summary(genesis_env, env_state, cat2_perturbations):
 
     print(f"{'=' * 70}")
     if warn_count:
-        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold")
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 2)")
+    print()
+
+
+# ===========================================================================
+# Category 3 — Temporal / Latency perturbations
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat3_perturbations(genesis_env):
+    """Instantiate all 6 Cat 3 perturbations."""
+    from genesis_robust_rl.perturbations.category_3_temporal import (
+        ActionFixedDelay,
+        ActionVariableDelay,
+        ComputationOverload,
+        ObsFixedDelay,
+        ObsVariableDelay,
+        PacketLoss,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "ObsFixedDelay": ObsFixedDelay(
+            obs_slice=slice(0, 6), obs_dim=6, n_envs=n, dt=dt,
+        ),
+        "ObsVariableDelay": ObsVariableDelay(
+            obs_slice=slice(0, 6), obs_dim=6, n_envs=n, dt=dt,
+        ),
+        "ActionFixedDelay": ActionFixedDelay(n_envs=n, dt=dt, action_dim=4),
+        "ActionVariableDelay": ActionVariableDelay(n_envs=n, dt=dt, action_dim=4),
+        "PacketLoss": PacketLoss(n_envs=n, dt=dt, action_dim=4),
+        "ComputationOverload": ComputationOverload(n_envs=n, dt=dt, action_dim=4),
+    }
+
+
+CAT3_OBS_NAMES = ["ObsFixedDelay", "ObsVariableDelay"]
+CAT3_ACTION_NAMES = [
+    "ActionFixedDelay",
+    "ActionVariableDelay",
+    "PacketLoss",
+    "ComputationOverload",
+]
+
+
+@pytest.mark.parametrize("name", CAT3_OBS_NAMES)
+def test_cat3_obs_overhead(genesis_env, cat3_perturbations, name):
+    """Cat 3 obs perturbation: tick + apply(obs) + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    p = cat3_perturbations[name]
+    obs = torch.randn(n_envs, 32)
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(obs)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat3-obs] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, (
+        f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+    )
+
+
+@pytest.mark.parametrize("name", CAT3_ACTION_NAMES)
+def test_cat3_action_overhead(genesis_env, cat3_perturbations, name):
+    """Cat 3 action perturbation: tick + apply(action) + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    p = cat3_perturbations[name]
+    action = torch.randn(n_envs, 4)
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(action)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat3-action] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, (
+        f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+    )
+
+
+def test_cat3_overhead_summary(genesis_env, cat3_perturbations):
+    """Print summary table of all Cat 3 perturbation overheads."""
+    from genesis_robust_rl.perturbations.base import ObservationPerturbation
+
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    obs = torch.randn(n_envs, 32)
+    action = torch.randn(n_envs, 4)
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 3 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
+    print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
+
+    warn_count = 0
+    all_cat3 = CAT3_OBS_NAMES + CAT3_ACTION_NAMES
+    for cat3_name in all_cat3:
+        p = cat3_perturbations[cat3_name]
+        p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+        is_obs = isinstance(p, ObservationPerturbation)
+
+        def make_cat3_loop(pert, obs_type):
+            if obs_type:
+                def loop():
+                    pert.tick(is_reset=False)
+                    pert.apply(obs)
+                    scene.step()
+            else:
+                def loop():
+                    pert.tick(is_reset=False)
+                    pert.apply(action)
+                    scene.step()
+            return loop
+
+        t_p = _measure_median(scene, make_cat3_loop(p, is_obs))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(
+            f"  {cat3_name:<28s} {t_p * 1e6:>7.0f}µs "
+            f"{dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}"
+        )
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 3)")
     print()
