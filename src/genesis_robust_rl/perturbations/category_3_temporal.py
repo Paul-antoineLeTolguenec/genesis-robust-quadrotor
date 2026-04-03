@@ -602,7 +602,7 @@ class ComputationOverload(ActionPerturbation):
         Returns:
             Action tensor with stalled envs holding their last valid action.
         """
-        stalled = (self._current_value.squeeze(-1) > 0.5)
+        stalled = self._current_value.squeeze(-1) > 0.5
         mask = stalled.unsqueeze(-1).expand_as(action)
         result = torch.where(mask, self._last_action, action)
         # Update last action for envs that are NOT stalled

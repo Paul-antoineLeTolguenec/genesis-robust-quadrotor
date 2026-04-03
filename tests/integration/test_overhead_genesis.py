@@ -521,10 +521,16 @@ def cat3_perturbations(genesis_env):
 
     return {
         "ObsFixedDelay": ObsFixedDelay(
-            obs_slice=slice(0, 6), obs_dim=6, n_envs=n, dt=dt,
+            obs_slice=slice(0, 6),
+            obs_dim=6,
+            n_envs=n,
+            dt=dt,
         ),
         "ObsVariableDelay": ObsVariableDelay(
-            obs_slice=slice(0, 6), obs_dim=6, n_envs=n, dt=dt,
+            obs_slice=slice(0, 6),
+            obs_dim=6,
+            n_envs=n,
+            dt=dt,
         ),
         "ActionFixedDelay": ActionFixedDelay(n_envs=n, dt=dt, action_dim=4),
         "ActionVariableDelay": ActionVariableDelay(n_envs=n, dt=dt, action_dim=4),
@@ -577,9 +583,7 @@ def test_cat3_obs_overhead(genesis_env, cat3_perturbations, name):
             stacklevel=1,
         )
 
-    assert overhead < MAX_OVERHEAD_FAIL, (
-        f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
-    )
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
 
 
 @pytest.mark.parametrize("name", CAT3_ACTION_NAMES)
@@ -617,9 +621,7 @@ def test_cat3_action_overhead(genesis_env, cat3_perturbations, name):
             stacklevel=1,
         )
 
-    assert overhead < MAX_OVERHEAD_FAIL, (
-        f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
-    )
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
 
 
 def test_cat3_overhead_summary(genesis_env, cat3_perturbations):
@@ -650,25 +652,25 @@ def test_cat3_overhead_summary(genesis_env, cat3_perturbations):
 
         def make_cat3_loop(pert, obs_type):
             if obs_type:
+
                 def loop():
                     pert.tick(is_reset=False)
                     pert.apply(obs)
                     scene.step()
             else:
+
                 def loop():
                     pert.tick(is_reset=False)
                     pert.apply(action)
                     scene.step()
+
             return loop
 
         t_p = _measure_median(scene, make_cat3_loop(p, is_obs))
         oh = (t_p - t_base) / t_base * 100
         dt_us = (t_p - t_base) * 1e6
         flag = " ⚠" if oh > 100 else ""
-        print(
-            f"  {cat3_name:<28s} {t_p * 1e6:>7.0f}µs "
-            f"{dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}"
-        )
+        print(f"  {cat3_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
         if oh > 100:
             warn_count += 1
 

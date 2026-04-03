@@ -198,9 +198,9 @@ def test_partial_reset(perturbation, n_envs):
     perturbation.reset(torch.tensor([0]))
     # env 0 was reset, others should be unchanged
     if n_envs > 1:
-        assert torch.allclose(
-            perturbation._current_value[1:], state_before[1:], atol=1e-6
-        ), "reset(env_ids=[0]) affected envs other than 0"
+        assert torch.allclose(perturbation._current_value[1:], state_before[1:], atol=1e-6), (
+            "reset(env_ids=[0]) affected envs other than 0"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -212,13 +212,10 @@ def test_partial_reset(perturbation, n_envs):
 def test_adversarial_tick_no_sample(perturbation):
     perturbation.tick(is_reset=True)
     perturbation.mode = PerturbationMode.ADVERSARIAL
-    with patch.object(
-        type(perturbation), "sample", wraps=perturbation.sample
-    ) as mock_s:
+    with patch.object(type(perturbation), "sample", wraps=perturbation.sample) as mock_s:
         perturbation.tick(is_reset=False)
         assert mock_s.call_count == 0, (
-            f"tick(is_reset=False) called sample() {mock_s.call_count} time(s) "
-            "in ADVERSARIAL mode"
+            f"tick(is_reset=False) called sample() {mock_s.call_count} time(s) in ADVERSARIAL mode"
         )
 
 

@@ -135,10 +135,14 @@ def test_packet_loss_last_action_not_updated_on_drop() -> None:
 def test_computation_overload_stall_duration() -> None:
     """A stall of duration D must produce exactly D steps of freeze."""
     p = ComputationOverload(
-        n_envs=1, dt=0.01, action_dim=4,
+        n_envs=1,
+        dt=0.01,
+        action_dim=4,
         distribution_params={
-            "prob_low": 1.0, "prob_high": 1.0,  # always trigger
-            "duration_low": 3, "duration_high": 3,  # fixed duration
+            "prob_low": 1.0,
+            "prob_high": 1.0,  # always trigger
+            "duration_low": 3,
+            "duration_high": 3,  # fixed duration
         },
         bounds=(0.0, 1.0),
     )
@@ -179,10 +183,14 @@ def test_computation_overload_stall_duration() -> None:
 def test_computation_overload_resumes_after_stall() -> None:
     """After stall counter reaches 0, new actions pass through (until re-trigger)."""
     p = ComputationOverload(
-        n_envs=1, dt=0.01, action_dim=4,
+        n_envs=1,
+        dt=0.01,
+        action_dim=4,
         distribution_params={
-            "prob_low": 0.0, "prob_high": 0.0,  # never re-trigger
-            "duration_low": 1, "duration_high": 1,
+            "prob_low": 0.0,
+            "prob_high": 0.0,  # never re-trigger
+            "duration_low": 1,
+            "duration_high": 1,
         },
         bounds=(0.0, 1.0),
     )

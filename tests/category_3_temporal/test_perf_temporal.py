@@ -102,18 +102,14 @@ def _make_obs_var(n: int) -> ObsVariableDelay:
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_obs_variable_delay_tick_cpu(n_envs: int) -> None:
     elapsed = _run_tick_perf(_make_obs_var, n_envs)
-    assert elapsed < MAX_TICK_MS_PER_STEP, (
-        f"ObsVariableDelay tick() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_TICK_MS_PER_STEP, f"ObsVariableDelay tick() too slow: {elapsed:.4f} ms"
 
 
 @pytest.mark.perf
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_obs_variable_delay_apply_cpu(n_envs: int) -> None:
     elapsed = _run_apply_perf_obs(_make_obs_var, n_envs)
-    assert elapsed < MAX_APPLY_MS_PER_STEP, (
-        f"ObsVariableDelay apply() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_APPLY_MS_PER_STEP, f"ObsVariableDelay apply() too slow: {elapsed:.4f} ms"
 
 
 # ---------------------------------------------------------------------------
@@ -129,18 +125,14 @@ def _make_act_fixed(n: int) -> ActionFixedDelay:
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_action_fixed_delay_tick_cpu(n_envs: int) -> None:
     elapsed = _run_tick_perf(_make_act_fixed, n_envs)
-    assert elapsed < MAX_TICK_MS_PER_STEP, (
-        f"ActionFixedDelay tick() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_TICK_MS_PER_STEP, f"ActionFixedDelay tick() too slow: {elapsed:.4f} ms"
 
 
 @pytest.mark.perf
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_action_fixed_delay_apply_cpu(n_envs: int) -> None:
     elapsed = _run_apply_perf_action(_make_act_fixed, n_envs)
-    assert elapsed < MAX_APPLY_MS_PER_STEP, (
-        f"ActionFixedDelay apply() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_APPLY_MS_PER_STEP, f"ActionFixedDelay apply() too slow: {elapsed:.4f} ms"
 
 
 # ---------------------------------------------------------------------------
@@ -156,9 +148,7 @@ def _make_act_var(n: int) -> ActionVariableDelay:
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_action_variable_delay_tick_cpu(n_envs: int) -> None:
     elapsed = _run_tick_perf(_make_act_var, n_envs)
-    assert elapsed < MAX_TICK_MS_PER_STEP, (
-        f"ActionVariableDelay tick() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_TICK_MS_PER_STEP, f"ActionVariableDelay tick() too slow: {elapsed:.4f} ms"
 
 
 @pytest.mark.perf
@@ -183,18 +173,14 @@ def _make_packet_loss(n: int) -> PacketLoss:
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_packet_loss_tick_cpu(n_envs: int) -> None:
     elapsed = _run_tick_perf(_make_packet_loss, n_envs)
-    assert elapsed < MAX_TICK_MS_PER_STEP, (
-        f"PacketLoss tick() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_TICK_MS_PER_STEP, f"PacketLoss tick() too slow: {elapsed:.4f} ms"
 
 
 @pytest.mark.perf
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_packet_loss_apply_cpu(n_envs: int) -> None:
     elapsed = _run_apply_perf_action(_make_packet_loss, n_envs)
-    assert elapsed < MAX_APPLY_MS_PER_STEP, (
-        f"PacketLoss apply() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_APPLY_MS_PER_STEP, f"PacketLoss apply() too slow: {elapsed:.4f} ms"
 
 
 # ---------------------------------------------------------------------------
@@ -210,9 +196,7 @@ def _make_computation_overload(n: int) -> ComputationOverload:
 @pytest.mark.parametrize("n_envs", [1, 512])
 def test_computation_overload_tick_cpu(n_envs: int) -> None:
     elapsed = _run_tick_perf(_make_computation_overload, n_envs)
-    assert elapsed < MAX_TICK_MS_PER_STEP, (
-        f"ComputationOverload tick() too slow: {elapsed:.4f} ms"
-    )
+    assert elapsed < MAX_TICK_MS_PER_STEP, f"ComputationOverload tick() too slow: {elapsed:.4f} ms"
 
 
 @pytest.mark.perf
