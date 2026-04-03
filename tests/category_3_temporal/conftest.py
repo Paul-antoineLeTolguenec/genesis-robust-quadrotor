@@ -1,7 +1,6 @@
 """Fixtures for category 3 — temporal / latency perturbations."""
 
 import pytest
-import torch
 
 from genesis_robust_rl.perturbations.category_3_temporal import (
     ActionFixedDelay,

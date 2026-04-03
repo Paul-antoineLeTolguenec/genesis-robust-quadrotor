@@ -18,7 +18,6 @@ from genesis_robust_rl.perturbations.base import (
 )
 from tests.conftest import assert_lipschitz
 
-
 # ---------------------------------------------------------------------------
 # U1 — sample() output within bounds (1000 draws)
 # ---------------------------------------------------------------------------
@@ -138,7 +137,6 @@ def test_stateful_persistence(perturbation, n_envs):
     if not perturbation.is_stateful:
         pytest.skip("stateless perturbation")
     perturbation.tick(is_reset=True)
-    state_after_reset = perturbation._current_value.clone()
     for _ in range(10):
         perturbation.tick(is_reset=False)
     # For per_step perturbations, _current_value changes via sample()/step()
