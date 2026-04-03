@@ -60,7 +60,7 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] Base `Perturbation` class + `OUProcess` + `DelayBuffer` + registry (`src/genesis_robust_rl/perturbations/base.py`)
 - [x] **[parallel]** Category 1 — Physics (GenesisSetterPerturbation, ExternalWrenchPerturbation) — 15 perturbations (15/15 done: 1.1–1.15 ✓)
 - [x] **[parallel]** Category 2 — Motor (MotorCommandPerturbation + ExternalWrenchPerturbation leaves) — 13 perturbations (13/13 done: 2.1–2.13 ✓)
-- [ ] **[parallel]** Category 3 — Temporal (ObsDelayBuffer, ActionDelayBuffer) — 8 perturbations
+- [x] **[parallel]** Category 3 — Temporal (ObsDelayBuffer, ActionDelayBuffer) — 6/6 perturbations done (3.1–3.4, 3.7, 3.8 ✓; 3.5, 3.6 are env-level wrappers → Phase 3)
 - [ ] **[parallel]** Category 4 — Sensor (SensorModel + ObservationPerturbation leaves) — 16 perturbations
 - [ ] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9 perturbations
 - [ ] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5 perturbations
@@ -110,9 +110,10 @@ Update status when starting (`in_progress`) and when done (`completed`).
 **base.py done + audited.** 5 blocking bugs fixed (tick DR guard, update_params Lipschitz, wrench_type dispatch, PerturbationRegistry). Genesis v0.4.0 migration: `scene.solver` → `scene.rigid_solver` in all code + tests.
 Cat 1 : 15/15 done (1.1–1.15 ✓, 741 passed, 234 skipped). 45 PNG generated.
 Cat 2 : 13/13 done (2.1–2.13 ✓, 1322 passed, 358 skipped). 26 PNG generated. 2 review rounds, 3 BLOCKING fixed.
-P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13% (all < 200%, CPU).
+Cat 3 : 6/6 done (3.1–3.4, 3.7, 3.8 ✓; 248 passed, 48 skipped). 10 PNG generated. 3 BLOCKING fixed (stall off-by-one, buffer capacity, syntax).
+P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25% (all < 200%, CPU).
 
-**Immediate next action:** implement Cat 3–8.
+**Immediate next action:** implement Cat 4–8.
 
 **Key design constraints to respect:**
 - `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)

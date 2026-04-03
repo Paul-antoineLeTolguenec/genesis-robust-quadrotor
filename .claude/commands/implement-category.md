@@ -184,31 +184,23 @@ Les WARNING sont listés mais ne bloquent pas.
 
 ## Phase 3 — Mesure d'overhead (après correction des BLOCKING)
 
+**Genesis v0.4.0 est installé localement** — toujours lancer les tests P6 avec le vrai simulateur.
+
 ### Étape 3.1 — Test P6 d'intégration
 
 Ajouter les nouvelles perturbations au fichier `tests/integration/test_overhead_genesis.py`.
-Lancer localement :
+Lancer **immédiatement** (ne PAS déléguer à l'utilisateur) :
 
 ```bash
-uv run pytest tests/integration/test_overhead_genesis.py -v -s -m genesis
+uv run pytest tests/integration/test_overhead_genesis.py -v -s -m genesis -k "catN"
 ```
 
-### Étape 3.2 — Graphes overhead
+Remplacer `catN` par le numéro de catégorie (ex: `cat3`).
+**Si un test échoue (overhead > 200%), corriger avant de continuer.**
 
-Créer/mettre à jour `docs/impl/plot_category_N_overhead.py` :
-- Overhead relatif (%) vs n_envs ∈ [1, 4, 16, 64, 128]
-- Baseline = `scene.step()` seul
-- 1 PNG par perturbation + 1 summary
+### Étape 3.2 — Rapport de mesure
 
-Lancer immédiatement : `uv run python docs/impl/plot_category_N_overhead.py`
-
-### Étape 3.3 — Mise à jour doc
-
-Remplir les sections "Performance overhead vs n_envs" dans `docs/impl/category_N_*.md` avec les valeurs mesurées.
-
-### Étape 3.4 — Rapport de mesure
-
-Produire un tableau résumé :
+Produire un tableau résumé à partir des résultats P6 :
 
 ```
 | Perturbation | Overhead (n=16) | Status | Notes |
@@ -218,7 +210,7 @@ Produire un tableau résumé :
 | N.8 Zzz | +230% | ❌ FAIL | _compute_wrench lourd |
 ```
 
-### Étape 3.5 — Mise à jour ROADMAP + MEMORY
+### Étape 3.3 — Mise à jour ROADMAP + MEMORY
 
 - `ROADMAP.md` : marquer la catégorie `[x]` ou `[~]`, mettre à jour le count
 - `MEMORY.md` : bloc "Current state", statut Cat N, date
