@@ -678,3 +678,159 @@ def test_cat3_overhead_summary(genesis_env, cat3_perturbations):
     if warn_count:
         print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 3)")
     print()
+
+
+# ===========================================================================
+# Category 4 — Sensor observation perturbations
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat4_perturbations(genesis_env):
+    """Instantiate all 16 Cat 4 perturbations."""
+    from genesis_robust_rl.perturbations.category_4_sensor import (
+        AccelNoiseBiasDrift,
+        BarometerDrift,
+        ClockDrift,
+        GyroBias,
+        GyroDrift,
+        GyroNoise,
+        IMUVibration,
+        MagnetometerInterference,
+        ObsChannelMasking,
+        OpticalFlowNoise,
+        PositionDropout,
+        PositionNoise,
+        PositionOutlier,
+        SensorCrossAxis,
+        SensorQuantization,
+        VelocityNoise,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    imu_vib = IMUVibration(obs_slice=slice(3, 6), n_envs=n, dt=dt)
+    imu_vib.set_rpm(torch.ones(n, 4) * 14000.0)
+
+    return {
+        "GyroNoise": GyroNoise(obs_slice=slice(0, 3), n_envs=n, dt=dt),
+        "GyroBias": GyroBias(obs_slice=slice(0, 3), n_envs=n, dt=dt),
+        "GyroDrift": GyroDrift(obs_slice=slice(0, 3), n_envs=n, dt=dt),
+        "AccelNoiseBiasDrift": AccelNoiseBiasDrift(obs_slice=slice(3, 6), n_envs=n, dt=dt),
+        "SensorCrossAxis": SensorCrossAxis(obs_slice=slice(0, 3), n_envs=n, dt=dt),
+        "PositionNoise": PositionNoise(obs_slice=slice(6, 9), n_envs=n, dt=dt),
+        "PositionDropout": PositionDropout(obs_slice=slice(6, 9), n_envs=n, dt=dt),
+        "PositionOutlier": PositionOutlier(obs_slice=slice(6, 9), n_envs=n, dt=dt),
+        "VelocityNoise": VelocityNoise(obs_slice=slice(9, 12), n_envs=n, dt=dt),
+        "SensorQuantization": SensorQuantization(obs_slice=slice(0, 6), n_envs=n, dt=dt),
+        "ObsChannelMasking": ObsChannelMasking(obs_slice=slice(0, 10), obs_dim=10, n_envs=n, dt=dt),
+        "MagnetometerInterference": MagnetometerInterference(
+            obs_slice=slice(12, 15), n_envs=n, dt=dt
+        ),
+        "BarometerDrift": BarometerDrift(obs_slice=slice(15, 16), n_envs=n, dt=dt),
+        "OpticalFlowNoise": OpticalFlowNoise(obs_slice=slice(16, 18), n_envs=n, dt=dt),
+        "IMUVibration": imu_vib,
+        "ClockDrift": ClockDrift(obs_slice=slice(0, 6), obs_dim=6, n_envs=n, dt=dt),
+    }
+
+
+CAT4_NAMES = [
+    "GyroNoise",
+    "GyroBias",
+    "GyroDrift",
+    "AccelNoiseBiasDrift",
+    "SensorCrossAxis",
+    "PositionNoise",
+    "PositionDropout",
+    "PositionOutlier",
+    "VelocityNoise",
+    "SensorQuantization",
+    "ObsChannelMasking",
+    "MagnetometerInterference",
+    "BarometerDrift",
+    "OpticalFlowNoise",
+    "IMUVibration",
+    "ClockDrift",
+]
+
+
+@pytest.mark.parametrize("name", CAT4_NAMES)
+def test_cat4_obs_overhead(genesis_env, cat4_perturbations, name):
+    """Cat 4 obs perturbation: tick + apply(obs) + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    p = cat4_perturbations[name]
+    obs = torch.randn(n_envs, 32)
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(obs)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat4] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+
+
+def test_cat4_overhead_summary(genesis_env, cat4_perturbations):
+    """Print summary table of all Cat 4 perturbation overheads."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    obs = torch.randn(n_envs, 32)
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 4 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
+    print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
+
+    warn_count = 0
+    for cat4_name in CAT4_NAMES:
+        p = cat4_perturbations[cat4_name]
+        p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+
+        def make_cat4_loop(pert):
+            def loop():
+                pert.tick(is_reset=False)
+                pert.apply(obs)
+                scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_cat4_loop(p))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(f"  {cat4_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 4)")
+    print()
