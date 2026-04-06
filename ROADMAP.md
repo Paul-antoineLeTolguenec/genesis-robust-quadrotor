@@ -62,8 +62,8 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] **[parallel]** Category 2 — Motor (MotorCommandPerturbation + ExternalWrenchPerturbation leaves) — 13 perturbations (13/13 done: 2.1–2.13 ✓)
 - [x] **[parallel]** Category 3 — Temporal (ObsDelayBuffer, ActionDelayBuffer) — 6/6 perturbations done (3.1–3.4, 3.7, 3.8 ✓; 3.5, 3.6 are env-level wrappers → Phase 3)
 - [x] **[parallel]** Category 4 — Sensor (SensorModel + ObservationPerturbation leaves) — 16/16 perturbations done (4.1–4.16 ✓) + 6 SensorModel forward models
-- [ ] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9 perturbations
-- [ ] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5 perturbations
+- [x] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9/9 perturbations done (5.1–5.9 ✓)
+- [x] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5/5 perturbations done (6.1–6.5 ✓)
 - [ ] **[parallel]** Category 7 — Payload (GenesisSetterPerturbation leaves) — 3 perturbations
 - [ ] **[parallel]** Category 8 — External force/torque (ExternalWrenchPerturbation leaves) — 2 perturbations
 - [ ] Perturbation registry + auto-doc API
@@ -112,9 +112,11 @@ Cat 1 : 15/15 done (1.1–1.15 ✓, 741 passed, 234 skipped). 45 PNG generated.
 Cat 2 : 13/13 done (2.1–2.13 ✓, 1322 passed, 358 skipped). 26 PNG generated. 2 review rounds, 3 BLOCKING fixed.
 Cat 3 : 6/6 done (3.1–3.4, 3.7, 3.8 ✓; 248 passed, 48 skipped). 10 PNG generated. 3 BLOCKING fixed (stall off-by-one, buffer capacity, syntax).
 Cat 4 : 16/16 done (4.1–4.16 ✓; 669 passed, 198 skipped). 32 PNG generated. 6 SensorModel forward models. 3 BLOCKING fixed (noise bounds semantics, IMUVibration dim, SensorCrossAxis bounds).
-P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25%. Cat 4 obs +5-33% (all < 200%, CPU).
+Cat 5 : 9/9 done (5.1–5.9 ✓; 342 passed, 117 skipped). 18 PNG generated. 4 BLOCKING fixed (per-env sigma, force buf alloc, vectorized proximity). 1 WARNING (ProximityDisturbance +111%).
+Cat 6 : 5/5 done (6.1–6.5 ✓; 178 passed, 59 skipped). 10 PNG generated. 0 BLOCKING, perf optimizations applied.
+P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25%. Cat 4 obs +5-33%. Cat 5 wrench +67-111%. Cat 6 action +6-14% (all < 200%, CPU).
 
-**Immediate next action:** implement Cat 5–8.
+**Immediate next action:** implement Cat 7–8.
 
 **Key design constraints to respect:**
 - `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)

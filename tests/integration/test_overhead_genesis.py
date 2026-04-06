@@ -834,3 +834,259 @@ def test_cat4_overhead_summary(genesis_env, cat4_perturbations):
     if warn_count:
         print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 4)")
     print()
+
+
+# ===========================================================================
+# Category 5 — Wind perturbations
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat5_perturbations(genesis_env):
+    """Instantiate all 9 Cat 5 wind perturbations."""
+    from genesis_robust_rl.perturbations.category_5_wind import (
+        AdversarialWind,
+        BladeVortexInteraction,
+        ConstantWind,
+        GroundEffectBoundary,
+        PayloadSway,
+        ProximityDisturbance,
+        Turbulence,
+        WindGust,
+        WindShear,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "ConstantWind": ConstantWind(n_envs=n, dt=dt),
+        "Turbulence": Turbulence(n_envs=n, dt=dt),
+        "WindGust": WindGust(n_envs=n, dt=dt),
+        "WindShear": WindShear(n_envs=n, dt=dt),
+        "AdversarialWind": AdversarialWind(n_envs=n, dt=dt),
+        "BladeVortexInteraction": BladeVortexInteraction(n_envs=n, dt=dt),
+        "GroundEffectBoundary": GroundEffectBoundary(n_envs=n, dt=dt),
+        "PayloadSway": PayloadSway(n_envs=n, dt=dt),
+        "ProximityDisturbance": ProximityDisturbance(n_envs=n, dt=dt),
+    }
+
+
+CAT5_NAMES = [
+    "ConstantWind",
+    "Turbulence",
+    "WindGust",
+    "WindShear",
+    "AdversarialWind",
+    "BladeVortexInteraction",
+    "GroundEffectBoundary",
+    "PayloadSway",
+    "ProximityDisturbance",
+]
+
+
+@pytest.mark.parametrize("name", CAT5_NAMES)
+def test_cat5_wrench_overhead(genesis_env, env_state, cat5_perturbations, name):
+    """Cat 5 wrench perturbation: tick + apply + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    p = cat5_perturbations[name]
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+    if p.frequency == "per_step":
+        p.tick(is_reset=False)
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(scene, drone, env_state)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat5] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+
+
+def test_cat5_overhead_summary(genesis_env, env_state, cat5_perturbations):
+    """Print summary table of all Cat 5 perturbation overheads."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    n_envs = genesis_env["n_envs"]
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 5 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
+    print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
+
+    warn_count = 0
+    for cat5_name in CAT5_NAMES:
+        p = cat5_perturbations[cat5_name]
+        p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+
+        def make_cat5_loop(pert):
+            def loop():
+                pert.tick(is_reset=False)
+                pert.apply(scene, drone, env_state)
+                scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_cat5_loop(p))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(f"  {cat5_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 5)")
+    print()
+
+
+# ===========================================================================
+# Category 6 — Action perturbations
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat6_perturbations(genesis_env):
+    """Instantiate all 5 Cat 6 action perturbations."""
+    from genesis_robust_rl.perturbations.category_6_action import (
+        ActionDeadzone,
+        ActionNoise,
+        ActionSaturation,
+        ActuatorHysteresis,
+        ESCLowPassFilter,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "ActionNoise": ActionNoise(n_envs=n, dt=dt),
+        "ActionDeadzone": ActionDeadzone(n_envs=n, dt=dt),
+        "ActionSaturation": ActionSaturation(n_envs=n, dt=dt),
+        "ActuatorHysteresis": ActuatorHysteresis(n_envs=n, dt=dt),
+        "ESCLowPassFilter": ESCLowPassFilter(n_envs=n, dt=dt),
+    }
+
+
+CAT6_NAMES = [
+    "ActionNoise",
+    "ActionDeadzone",
+    "ActionSaturation",
+    "ActuatorHysteresis",
+    "ESCLowPassFilter",
+]
+
+
+@pytest.mark.parametrize("name", CAT6_NAMES)
+def test_cat6_action_overhead(genesis_env, cat6_perturbations, name):
+    """Cat 6 action perturbation: tick + apply(action) + scene.step()."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    p = cat6_perturbations[name]
+    action = torch.randn(n_envs, 4)
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+    if p.frequency == "per_step":
+        p.tick(is_reset=False)
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(action)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat6] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"{name}: overhead {overhead_pct:.1f}% exceeds 100%",
+            UserWarning,
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"{name}: overhead {overhead_pct:.1f}% exceeds 200% limit"
+
+
+def test_cat6_overhead_summary(genesis_env, cat6_perturbations):
+    """Print summary table of all Cat 6 perturbation overheads."""
+    scene = genesis_env["scene"]
+    n_envs = genesis_env["n_envs"]
+    action = torch.randn(n_envs, 4)
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 6 Overhead Summary (n_envs={n_envs}, CPU, CF2X)")
+    print(f"  Baseline: {t_base * 1e6:.0f} µs/step")
+    print(f"{'=' * 70}")
+    print(f"  {'Perturbation':<28s} {'Time':>8s} {'Delta':>8s} {'Overhead':>10s}")
+    print(f"  {'-' * 28} {'-' * 8} {'-' * 8} {'-' * 10}")
+
+    warn_count = 0
+    for cat6_name in CAT6_NAMES:
+        p = cat6_perturbations[cat6_name]
+        p.tick(is_reset=True, env_ids=torch.arange(n_envs))
+        if p.frequency == "per_step":
+            p.tick(is_reset=False)
+
+        def make_cat6_loop(pert):
+            def loop():
+                pert.tick(is_reset=False)
+                pert.apply(action)
+                scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_cat6_loop(p))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(f"  {cat6_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 6)")
+    print()
