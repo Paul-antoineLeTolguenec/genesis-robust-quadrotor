@@ -1204,3 +1204,113 @@ def test_cat7_overhead_summary(genesis_env, env_state, cat7_perturbations):
     if warn_count:
         print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 7)")
     print()
+
+
+# ===========================================================================
+# Category 8 — External disturbances
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat8_perturbations(genesis_env):
+    """Instantiate all Cat 8 external disturbance perturbations."""
+    from genesis_robust_rl.perturbations.category_8_external import (
+        BodyForceDisturbance,
+        BodyTorqueDisturbance,
+    )
+
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "BodyForce_uniform": BodyForceDisturbance(n_envs=n, dt=dt),
+        "BodyForce_ou": BodyForceDisturbance(n_envs=n, dt=dt, distribution="ou_process"),
+        "BodyTorque_uniform": BodyTorqueDisturbance(n_envs=n, dt=dt),
+        "BodyTorque_ou": BodyTorqueDisturbance(n_envs=n, dt=dt, distribution="ou_process"),
+    }
+
+
+CAT8_NAMES = [
+    "BodyForce_uniform",
+    "BodyForce_ou",
+    "BodyTorque_uniform",
+    "BodyTorque_ou",
+]
+
+
+@pytest.mark.parametrize("name", CAT8_NAMES)
+def test_cat8_external_overhead(genesis_env, env_state, cat8_perturbations, name):
+    """Cat 8 external disturbance: tick + apply + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    p = cat8_perturbations[name]
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(scene, drone, env_state)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat8] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"Cat8 {name} overhead {overhead_pct:.1f}% > 100%",
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"Cat8 {name} overhead {overhead_pct:.1f}% exceeds 200%"
+
+
+def test_cat8_overhead_summary(genesis_env, env_state, cat8_perturbations):
+    """Summary table for all Cat 8 perturbations."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 8 Overhead Summary (n_envs={genesis_env['n_envs']})")
+    print(f"  Baseline step: {t_base * 1e6:.0f}µs")
+    print(f"{'=' * 70}")
+
+    warn_count = 0
+    for cat8_name in CAT8_NAMES:
+        p = cat8_perturbations[cat8_name]
+        p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+
+        def make_cat8_loop(pert):
+            def loop():
+                pert.tick(is_reset=False)
+                pert.apply(scene, drone, env_state)
+                scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_cat8_loop(p))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(f"  {cat8_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 8)")
+    print()
