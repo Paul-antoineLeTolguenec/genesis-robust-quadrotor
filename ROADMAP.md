@@ -64,7 +64,7 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] **[parallel]** Category 4 — Sensor (SensorModel + ObservationPerturbation leaves) — 16/16 perturbations done (4.1–4.16 ✓) + 6 SensorModel forward models
 - [x] **[parallel]** Category 5 — Wind (ExternalWrenchPerturbation leaves) — 9/9 perturbations done (5.1–5.9 ✓)
 - [x] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5/5 perturbations done (6.1–6.5 ✓)
-- [ ] **[parallel]** Category 7 — Payload (GenesisSetterPerturbation leaves) — 3 perturbations
+- [x] **[parallel]** Category 7 — Payload (GenesisSetterPerturbation + ExternalWrenchPerturbation leaves) — 3/3 perturbations done (7.1–7.3 ✓)
 - [ ] **[parallel]** Category 8 — External force/torque (ExternalWrenchPerturbation leaves) — 2 perturbations
 - [ ] Perturbation registry + auto-doc API
 
@@ -114,9 +114,10 @@ Cat 3 : 6/6 done (3.1–3.4, 3.7, 3.8 ✓; 248 passed, 48 skipped). 10 PNG gener
 Cat 4 : 16/16 done (4.1–4.16 ✓; 669 passed, 198 skipped). 32 PNG generated. 6 SensorModel forward models. 3 BLOCKING fixed (noise bounds semantics, IMUVibration dim, SensorCrossAxis bounds).
 Cat 5 : 9/9 done (5.1–5.9 ✓; 342 passed, 117 skipped). 18 PNG generated. 4 BLOCKING fixed (per-env sigma, force buf alloc, vectorized proximity). 1 WARNING (ProximityDisturbance +111%).
 Cat 6 : 5/5 done (6.1–6.5 ✓; 178 passed, 59 skipped). 10 PNG generated. 0 BLOCKING, perf optimizations applied.
-P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25%. Cat 4 obs +5-33%. Cat 5 wrench +67-111%. Cat 6 action +6-14% (all < 200%, CPU).
+Cat 7 : 3/3 done (7.1–7.3 ✓; 108 passed, 45 skipped). 6 PNG generated. 3 ruff BLOCKING fixed (F401, I001, E501). 0 correctness BLOCKING.
+P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25%. Cat 4 obs +5-33%. Cat 5 wrench +67-111%. Cat 6 action +6-14%. Cat 7 setter +53-67% (all < 200%, CPU).
 
-**Immediate next action:** implement Cat 7–8.
+**Immediate next action:** implement Cat 8.
 
 **Key design constraints to respect:**
 - `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)

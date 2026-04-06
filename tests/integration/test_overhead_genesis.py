@@ -1090,3 +1090,117 @@ def test_cat6_overhead_summary(genesis_env, cat6_perturbations):
     if warn_count:
         print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 6)")
     print()
+
+
+# ===========================================================================
+# Category 7 — Payload & configuration perturbations
+# ===========================================================================
+
+
+@pytest.fixture(scope="module")
+def cat7_perturbations(genesis_env):
+    """Instantiate all 3 Cat 7 payload perturbations."""
+    from genesis_robust_rl.perturbations.category_7_payload import (
+        AsymmetricPropGuardDrag,
+        PayloadCOMOffset,
+        PayloadMass,
+    )
+
+    drone = genesis_env["drone"]
+    n = genesis_env["n_envs"]
+    dt = 0.005
+
+    return {
+        "PayloadMass": PayloadMass(
+            setter_fn=lambda v, idx: drone.set_mass_shift(v, idx),
+            n_envs=n,
+            dt=dt,
+        ),
+        "PayloadCOMOffset": PayloadCOMOffset(
+            setter_fn=lambda v, idx: drone.set_COM_shift(v, idx),
+            n_envs=n,
+            dt=dt,
+        ),
+        "AsymmetricPropGuardDrag": AsymmetricPropGuardDrag(n_envs=n, dt=dt),
+    }
+
+
+CAT7_NAMES = ["PayloadMass", "PayloadCOMOffset", "AsymmetricPropGuardDrag"]
+
+
+@pytest.mark.parametrize("name", CAT7_NAMES)
+def test_cat7_payload_overhead(genesis_env, env_state, cat7_perturbations, name):
+    """Cat 7 payload perturbation: tick + apply + scene.step() overhead."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    p = cat7_perturbations[name]
+    scene.reset()
+
+    p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    def perturbed_loop():
+        p.tick(is_reset=False)
+        p.apply(scene, drone, env_state)
+        scene.step()
+
+    t_pert = _measure_median(scene, perturbed_loop)
+
+    overhead = (t_pert - t_base) / t_base
+    overhead_pct = overhead * 100
+    delta_us = (t_pert - t_base) * 1e6
+
+    print(
+        f"\n  [Cat7] {name}: base={t_base * 1e6:.0f}µs  "
+        f"pert={t_pert * 1e6:.0f}µs  delta={delta_us:.0f}µs  "
+        f"overhead={overhead_pct:+.1f}%"
+    )
+
+    if overhead > MAX_OVERHEAD_WARN:
+        warnings.warn(
+            f"Cat7 {name} overhead {overhead_pct:.1f}% > 100%",
+            stacklevel=1,
+        )
+
+    assert overhead < MAX_OVERHEAD_FAIL, f"Cat7 {name} overhead {overhead_pct:.1f}% exceeds 200%"
+
+
+def test_cat7_overhead_summary(genesis_env, env_state, cat7_perturbations):
+    """Summary table for all Cat 7 perturbations."""
+    scene = genesis_env["scene"]
+    drone = genesis_env["drone"]
+    scene.reset()
+
+    t_base = _measure_median(scene, lambda: scene.step())
+
+    print(f"\n{'=' * 70}")
+    print(f"  Cat 7 Overhead Summary (n_envs={genesis_env['n_envs']})")
+    print(f"  Baseline step: {t_base * 1e6:.0f}µs")
+    print(f"{'=' * 70}")
+
+    warn_count = 0
+    for cat7_name in CAT7_NAMES:
+        p = cat7_perturbations[cat7_name]
+        p.tick(is_reset=True, env_ids=torch.arange(genesis_env["n_envs"]))
+
+        def make_cat7_loop(pert):
+            def loop():
+                pert.tick(is_reset=False)
+                pert.apply(scene, drone, env_state)
+                scene.step()
+
+            return loop
+
+        t_p = _measure_median(scene, make_cat7_loop(p))
+        oh = (t_p - t_base) / t_base * 100
+        dt_us = (t_p - t_base) * 1e6
+        flag = " ⚠" if oh > 100 else ""
+        print(f"  {cat7_name:<28s} {t_p * 1e6:>7.0f}µs {dt_us:>+7.0f}µs {oh:>+9.1f}%{flag}")
+        if oh > 100:
+            warn_count += 1
+
+    print(f"{'=' * 70}")
+    if warn_count:
+        print(f"  ⚠ {warn_count} perturbation(s) above 100% warning threshold (Cat 7)")
+    print()
