@@ -66,15 +66,14 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] **[parallel]** Category 6 — Action (ActionPerturbation leaves) — 5/5 perturbations done (6.1–6.5 ✓)
 - [x] **[parallel]** Category 7 — Payload (GenesisSetterPerturbation + ExternalWrenchPerturbation leaves) — 3/3 perturbations done (7.1–7.3 ✓)
 - [x] **[parallel]** Category 8 — External force/torque (ExternalWrenchPerturbation leaves) — 2/2 perturbations done (8.1–8.2 ✓)
-- [ ] Perturbation registry + auto-doc API
-
 ## Phase 3 — Base Gym Environment
-- [ ] Genesis quadrotor integration
-- [ ] `RobustDroneEnv` base class (Gymnasium-compatible)
-- [ ] Perturbation application hooks (physics, obs, action)
-- [ ] Variable delta_t integration
-- [ ] Domain randomization mode (sample from distributions)
-- [ ] Unit tests
+- [x] Genesis quadrotor integration
+- [x] `RobustDroneEnv` base class (Gymnasium-compatible)
+- [x] Perturbation application hooks (physics, obs, action)
+- [x] Variable delta_t integration (substeps 3.5 + desync 3.6)
+- [x] Domain randomization mode (sample from distributions)
+- [x] Adversarial mode API (set_perturbation_values, update_params, curriculum)
+- [x] Unit tests (101 passed, 0 skipped)
 
 ## Phase 4 — Adversarial API
 - [ ] `AdversarialEnv` wrapper — adversary sets perturbations each step
@@ -90,6 +89,7 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [ ] Sim-to-real transfer experiments
 
 ## Phase 6 — Documentation & Release
+- [ ] Perturbation registry + auto-doc API
 - [ ] README with quickstart
 - [ ] Full API reference
 - [ ] Example notebooks
@@ -105,20 +105,22 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 2 — Perturbation Engine** — in progress
+**Phase 3 — Base Gym Environment** — COMPLETED
 
-**base.py done + audited.** 5 blocking bugs fixed (tick DR guard, update_params Lipschitz, wrench_type dispatch, PerturbationRegistry). Genesis v0.4.0 migration: `scene.solver` → `scene.rigid_solver` in all code + tests.
-Cat 1 : 15/15 done (1.1–1.15 ✓, 741 passed, 234 skipped). 45 PNG generated.
-Cat 2 : 13/13 done (2.1–2.13 ✓, 1322 passed, 358 skipped). 26 PNG generated. 2 review rounds, 3 BLOCKING fixed.
-Cat 3 : 6/6 done (3.1–3.4, 3.7, 3.8 ✓; 248 passed, 48 skipped). 10 PNG generated. 3 BLOCKING fixed (stall off-by-one, buffer capacity, syntax).
-Cat 4 : 16/16 done (4.1–4.16 ✓; 669 passed, 198 skipped). 32 PNG generated. 6 SensorModel forward models. 3 BLOCKING fixed (noise bounds semantics, IMUVibration dim, SensorCrossAxis bounds).
-Cat 5 : 9/9 done (5.1–5.9 ✓; 342 passed, 117 skipped). 18 PNG generated. 4 BLOCKING fixed (per-env sigma, force buf alloc, vectorized proximity). 1 WARNING (ProximityDisturbance +111%).
-Cat 6 : 5/5 done (6.1–6.5 ✓; 178 passed, 59 skipped). 10 PNG generated. 0 BLOCKING, perf optimizations applied.
-Cat 7 : 3/3 done (7.1–7.3 ✓; 108 passed, 45 skipped). 6 PNG generated. 3 ruff BLOCKING fixed (F401, I001, E501). 0 correctness BLOCKING.
-Cat 8 : 2/2 done (8.1–8.2 ✓; 168 passed, 48 skipped). 4 PNG generated. 3 BLOCKING fixed (duplication→base class, OU double update, perf in-place). 0 correctness BLOCKING.
-P6 overhead: Cat 1 combined +3.9%. Cat 2 wrench +67-83%, motor cmd +4-13%. Cat 3 obs +46-60%, action +14-25%. Cat 4 obs +5-33%. Cat 5 wrench +67-111%. Cat 6 action +6-14%. Cat 7 setter +53-67%. Cat 8 wrench +62-77% (all < 200%, CPU).
+**Phase 3 summary:**
+- `PerturbationConfig`, `SensorConfig`, `DesyncConfig` — config dataclasses with validation
+- `RobustDroneEnv(gym.Env)` — abstract base, Gymnasium-compatible
+  - reset() [1]-[7], step() [0]-[11] — conformes à `04_interactions.md`
+  - 4 hooks: physics, motor, sensor, action
+  - Variable delta_t (3.5 substeps jitter) + desync (3.6 correlated obs/action delay)
+  - Privileged obs, mode switch DR/ADV, curriculum scale, set_perturbation_values, update_params
+  - `policy_to_rpm()` and `_compute_reward()` are `@abstractmethod` stubs
+- 3 review agents: 2 BLOCKING fixed (non-scalar nominal, hardcoded action_dim), 3 HIGH WARNING fixed (cached all_perturbations, mode check, frozen DesyncConfig)
+- 101 tests passed, 0 regressions (3075 total suite)
 
-**Immediate next action:** finalize Phase 2 (perturbation registry + auto-doc API), then Phase 3.
+**Phase 2 COMPLETED** — 69 perturbations, 8 categories, all P6 < 200%. Registry auto-doc deferred to Phase 6.
+
+**Immediate next action:** Phase 4 — AdversarialEnv wrapper.
 
 **Key design constraints to respect:**
 - `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)
