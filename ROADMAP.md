@@ -76,11 +76,11 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] Unit tests (101 passed, 0 skipped)
 
 ## Phase 4 — Adversarial API
-- [ ] `AdversarialEnv` wrapper — adversary sets perturbations each step
-- [ ] Action space for adversary (bounded, Lipschitz-constrained)
+- [x] `AdversarialEnv` wrapper — adversary sets perturbations each step
+- [x] Action space for adversary (bounded, Lipschitz-constrained)
 - [ ] Minimax training loop utility
 - [ ] Adversarial agent base class
-- [ ] Unit tests
+- [x] Unit tests (37 passed)
 
 ## Phase 5 — Robust RL Contribution
 - [ ] Curriculum over perturbation intensity
@@ -105,26 +105,21 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 3 — Base Gym Environment** — COMPLETED
+**Phase 4 — Adversarial API** — IN PROGRESS (AdversarialEnv done, minimax loop + agent base remaining)
 
-**Phase 3 summary:**
-- `PerturbationConfig`, `SensorConfig`, `DesyncConfig` — config dataclasses with validation
-- `RobustDroneEnv(gym.Env)` — abstract base, Gymnasium-compatible
-  - reset() [1]-[7], step() [0]-[11] — conformes à `04_interactions.md`
-  - 4 hooks: physics, motor, sensor, action
-  - Variable delta_t (3.5 substeps jitter) + desync (3.6 correlated obs/action delay)
-  - Privileged obs, mode switch DR/ADV, curriculum scale, set_perturbation_values, update_params
-  - `policy_to_rpm()` and `_compute_reward()` are `@abstractmethod` stubs
-- 3 review agents: 2 BLOCKING fixed (non-scalar nominal, hardcoded action_dim), 3 HIGH WARNING fixed (cached all_perturbations, mode check, frozen DesyncConfig)
-- 101 tests passed, 0 regressions (3075 total suite)
+**Phase 4 progress:**
+- `AdversarialEnv` wrapper — thin delegation to `RobustDroneEnv`
+  - __init__: adversary_targets validation (stateful/global exclusion), adversary_action_space (flat 1D Box)
+  - step(): sequence [A1]–[A4] conforme à `04_interactions.md §4`
+  - _adversary_reward(): default zero-sum, overridable
+  - reset(): delegates to env.reset()
+  - __getattr__: forwards attributes to wrapped env
+  - adversary_mode="params" → NotImplementedError (future)
+- 3 review agents: 2 BLOCKING fixed (params mode dead code, gym.Env compat), 5 WARNING noted
+- 37 tests passed, 0 regressions (3112 total suite)
 
-**Phase 2 COMPLETED** — 69 perturbations, 8 categories, all P6 < 200%. Registry auto-doc deferred to Phase 6.
+**Remaining Phase 4 items:**
+- Minimax training loop utility
+- Adversarial agent base class
 
-**Immediate next action:** Phase 4 — AdversarialEnv wrapper.
-
-**Key design constraints to respect:**
-- `MotorCommandPerturbation` inherits from `Perturbation` (not `PhysicsPerturbation`)
-- Physics perturbations called at step [6] post_physics¹ — see `01_perturbations_catalog.md` §Category 1 note
-- `OUProcess.step()` must use torch ops only (no numpy)
-- `DelayBuffer` uses circular `Tensor[n_envs, max_delay, dim]` — no Python deque
-- `tick(is_reset, env_ids=None)` — env_ids is optional (None = all envs)
+**Immediate next action:** Implement minimax training loop or adversarial agent base class.
