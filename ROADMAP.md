@@ -78,13 +78,20 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ## Phase 4 — Adversarial API
 - [x] `AdversarialEnv` wrapper — adversary sets perturbations each step
 - [x] Action space for adversary (bounded, Lipschitz-constrained)
-- [ ] Minimax training loop utility
-- [ ] Adversarial agent base class
+- [x] Minimax training loop utility (absorbed into Phase 5)
+- [x] Adversarial agent base class (absorbed into Phase 5)
 - [x] Unit tests (37 passed)
 
 ## Phase 5 — Robust RL Contribution
-- [ ] Curriculum over perturbation intensity
-- [ ] Algorithm integration (PPO + adversarial)
+- [x] `AdversarialAgent` Protocol + `RolloutData` (`adversarial/protocol.py`)
+- [x] `ActorCritic` shared MLP network (`adversarial/networks.py`)
+- [x] `PPOAgent` reference implementation (`adversarial/ppo_agent.py`)
+- [x] `CurriculumScheduler` callback (`adversarial/curriculum.py`)
+- [x] `train()` loop — DR / RARL / RAP modes (`adversarial/training_loop.py`)
+- [x] `privileged_obs_dim` property on `RobustDroneEnv`
+- [x] `env_ids` support on `AdversarialEnv.reset()`
+- [x] Design doc `docs/07_adversarial_training.md` (reviewed, 4 BLOCKING fixed)
+- [x] Unit tests (32 passed, 3144 total suite)
 - [ ] Benchmarks vs DR classical / minimax / DRRL
 - [ ] Sim-to-real transfer experiments
 
@@ -105,21 +112,23 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 4 — Adversarial API** — IN PROGRESS (AdversarialEnv done, minimax loop + agent base remaining)
+**Phase 5 — Robust RL Contribution** — PARTIALLY COMPLETED
 
-**Phase 4 progress:**
-- `AdversarialEnv` wrapper — thin delegation to `RobustDroneEnv`
-  - __init__: adversary_targets validation (stateful/global exclusion), adversary_action_space (flat 1D Box)
-  - step(): sequence [A1]–[A4] conforme à `04_interactions.md §4`
-  - _adversary_reward(): default zero-sum, overridable
-  - reset(): delegates to env.reset()
-  - __getattr__: forwards attributes to wrapped env
-  - adversary_mode="params" → NotImplementedError (future)
-- 3 review agents: 2 BLOCKING fixed (params mode dead code, gym.Env compat), 5 WARNING noted
-- 37 tests passed, 0 regressions (3112 total suite)
+**Phase 4 COMPLETED** — `AdversarialEnv` wrapper (37 tests), PR #10.
 
-**Remaining Phase 4 items:**
-- Minimax training loop utility
-- Adversarial agent base class
+**Phase 5 progress:**
+- `AdversarialAgent` Protocol + `RolloutData` dataclass
+- `ActorCritic` shared MLP (Gaussian policy + value head)
+- `PPOAgent` reference PPO with GAE
+- `CurriculumScheduler` (linear/cosine/step schedules, callback)
+- `train()` loop — DR / RARL (alternating) / RAP (joint) modes
+- `privileged_obs_dim` property on `RobustDroneEnv`
+- `env_ids` support added to `AdversarialEnv.reset()`
+- Design doc `docs/07_adversarial_training.md` — 2-agent review, 4 BLOCKING fixed
+- 32 new tests passed, 3144 total suite, 0 regressions
 
-**Immediate next action:** Implement minimax training loop or adversarial agent base class.
+**Remaining Phase 5 items:**
+- Benchmarks vs DR classical / minimax / DRRL
+- Sim-to-real transfer experiments (requires hardware)
+
+**Immediate next action:** Benchmarks or Phase 6 (docs & release).

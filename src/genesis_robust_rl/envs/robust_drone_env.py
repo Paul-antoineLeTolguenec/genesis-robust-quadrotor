@@ -403,6 +403,15 @@ class RobustDroneEnv(gym.Env):
     # Extra obs hook (subclass override)
     # ------------------------------------------------------------------
 
+    @property
+    def privileged_obs_dim(self) -> int:
+        """Total dimension of privileged observations (all observable perturbations)."""
+        return sum(
+            math.prod(p.dimension)
+            for p in self._perturbation_cfg.all_perturbations()
+            if p.observable
+        )
+
     def _extra_obs_dim(self) -> int:
         """Return dimension of extra observations appended after sensor readings."""
         return 0
