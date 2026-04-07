@@ -116,11 +116,12 @@ class AdversarialEnv:
     def reset(
         self,
         *,
+        env_ids: Tensor | None = None,
         seed: int | None = None,
         options: dict | None = None,
     ) -> tuple[Tensor, dict]:
         """Delegate to env.reset(). Resets _current_value to nominal."""
-        return self.env.reset(seed=seed, options=options)
+        return self.env.reset(env_ids=env_ids, seed=seed, options=options)
 
     def step(
         self,
