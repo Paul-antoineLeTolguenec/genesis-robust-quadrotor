@@ -21,14 +21,16 @@ import genesis as gs
 import torch
 
 from genesis_robust_rl.perturbations.base import EnvState, Perturbation
-from genesis_robust_rl.perturbations.category_1_physics import MassShift
 from genesis_robust_rl.perturbations.category_5_wind import WindGust
 
-HOVER_RPM = 14468.4  # Approximate CF2X hover RPM (mass 0.027 kg, 4 motors)
+HOVER_RPM = 14475.9  # Calibrated CF2X hover RPM (mass 0.027 kg, KF 3.16e-10)
 N_STEPS = 240
 DT = 0.01
 FPS = 30
 RESOLUTION = (640, 480)
+CAMERA_POS = (0.5, -0.5, 0.65)
+CAMERA_LOOKAT = (0.0, 0.0, 0.5)
+CAMERA_FOV = 45
 
 
 def build_scene() -> tuple[gs.Scene, Any, Any]:
@@ -45,13 +47,13 @@ def build_scene() -> tuple[gs.Scene, Any, Any]:
     )
     scene.add_entity(gs.morphs.Plane())
     drone = scene.add_entity(
-        gs.morphs.URDF(file="urdf/drones/cf2x.urdf", pos=(0, 0, 0.5)),
+        gs.morphs.Drone(file="urdf/drones/cf2x.urdf", pos=(0, 0, 0.5)),
     )
     camera = scene.add_camera(
         res=RESOLUTION,
-        pos=(1.8, -1.8, 1.2),
-        lookat=(0.0, 0.0, 0.6),
-        fov=40,
+        pos=CAMERA_POS,
+        lookat=CAMERA_LOOKAT,
+        fov=CAMERA_FOV,
         GUI=False,
     )
     scene.build(n_envs=1)
@@ -84,22 +86,16 @@ def build_perturbations(scenario: str, drone: Any) -> list[Perturbation]:
         WindGust(
             n_envs=1,
             dt=DT,
+            link_idx=drone.base_link_idx,
             distribution_params={
                 "prob_low": 0.08,
                 "prob_high": 0.08,
-                "mag_low": 6.0,
-                "mag_high": 12.0,
-                "duration_low": 15,
-                "duration_high": 40,
+                "mag_low": 0.004,
+                "mag_high": 0.009,
+                "duration_low": 25,
+                "duration_high": 60,
             },
-            bounds=(-15.0, 15.0),
-        ),
-        MassShift(
-            setter_fn=lambda v, idx: drone.set_mass_shift(v, idx),
-            n_envs=1,
-            dt=DT,
-            distribution_params={"low": 0.012, "high": 0.012},
-            bounds=(-0.02, 0.02),
+            bounds=(-0.015, 0.015),
         ),
     ]
 
@@ -119,10 +115,10 @@ def run_scenario(scenario: str, output_path: Path) -> None:
     camera.start_recording()
     for _ in range(N_STEPS):
         env_state = make_env_state(drone)
+        drone.set_propellels_rpm(rpm)
         for p in perturbations:
             p.tick(is_reset=False)
             p.apply(scene, drone, env_state)
-        drone.set_propellels_rpm(rpm)
         scene.step()
         camera.render()
     camera.stop_recording(save_to_filename=str(output_path), fps=FPS)

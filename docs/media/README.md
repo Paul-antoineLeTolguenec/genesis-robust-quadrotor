@@ -25,15 +25,19 @@ Outputs `docs/media/baseline.gif` and `docs/media/perturbed.gif`.
 
 | Scenario | Perturbations | Expected visual |
 |----------|---------------|-----------------|
-| `baseline` | none | Stable hover at ~0.5 m |
-| `perturbed` | `WindGust` (mag 6-12 N, prob 8%/step) + `MassShift` (+12 g offset) | Drifted, oscillating trajectory |
+| `baseline` | none | Stable hover at z ≈ 0.5 m |
+| `perturbed` | `WindGust` (mag 0.004–0.009 N, prob 8%/step) | Drifted trajectory, up to ~0.3 m horizontal |
 
-Both run for 240 steps at dt=0.01s (8 s sim time) with 30 fps video output.
+Both run for 240 steps at dt=0.01 s (8 s sim time) with 30 fps video output,
+calibrated hover RPM = 14 476 (CF2X, 27 g, KF=3.16e-10).
+
+The `perturbed` scenario passes `link_idx=drone.base_link_idx` to `WindGust`
+so the force targets the drone base link, not the first-added plane entity.
 
 ## Notes
 
 - Genesis camera uses offscreen rendering (`GUI=False`) — no display required.
-- Genesis rendering on macOS CPU backend has not been validated upstream; if it
-  fails, run these scripts on a Linux CUDA machine.
+- Validated on macOS CPU backend (Mac M4 Pro); should also work on Linux + CUDA.
 - `gs.init()` can only be called once per Python process, so each scenario runs
   in its own invocation.
+- MP4s are gitignored (regeneratable); only the GIFs are committed.

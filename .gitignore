@@ -24,3 +24,6 @@ htmlcov/
 # Ruff / pytest caches
 .ruff_cache/
 .pytest_cache/
+
+# Generated demo MP4s (GIFs are committed, MP4s are regeneratable)
+docs/media/*.mp4

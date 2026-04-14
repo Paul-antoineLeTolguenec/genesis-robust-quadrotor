@@ -27,6 +27,14 @@ Training policies that transfer from simulation to reality is the central unsolv
 
 ## Showcase
 
+### Hover under nominal conditions vs wind disturbances
+
+| Baseline (no perturbations) | Perturbed (WindGust active) |
+|:---:|:---:|
+| ![Baseline hover](docs/media/baseline.gif) | ![Perturbed hover](docs/media/perturbed.gif) |
+
+Regenerate these demos with the scripts under [`docs/media/`](docs/media/).
+
 ### Overhead stays under 5% — validated on real Crazyflie CF2X
 
 ![Overhead summary](docs/impl/assets/cat1_all_overhead_summary.png)
@@ -42,8 +50,6 @@ Training policies that transfer from simulation to reality is the central unsolv
 ### Performance scaling with environment count
 
 ![Mass shift perf](docs/impl/assets/cat1_mass_shift_perf.png)
-
-> **Demo GIFs** — real-time drone behavior under perturbations coming in the next release.
 
 ---
 
