@@ -5,7 +5,7 @@ At the start of each session, read this file to locate the current milestone.
 Update status when starting (`in_progress`) and when done (`completed`).
 
 **Design review rule:** before marking any design doc `[x]`, launch 2–3 parallel review subagents
-(see `CLAUDE.md` → "Design Review Protocol"). Resolve all blocking issues first.
+(see `.agents/knowledge/topics/design_review.md`). Resolve all blocking issues first.
 
 ## Status legend
 - `[ ]` not started
