@@ -347,16 +347,42 @@ class GenesisSetterPerturbation(PhysicsPerturbation):
 
     The setter_fn is bound at construction (caller passes e.g. drone.set_links_mass_shift).
     apply() calls setter_fn with _current_value and a full envs_idx tensor.
+
+    Performance: Genesis setters persist the value server-side until overwritten,
+    so ``apply()`` skips the call whenever the current value has not changed
+    since the last apply. Change detection uses tensor identity AND torch's
+    ``._version`` counter, so in-place mutations (``value[...] = x``) also
+    invalidate the cache. Callers of :meth:`set_value` must still treat the
+    contract as "pass a fresh tensor"; the version counter is a safety net,
+    not a license for in-place mutation.
+
+    ``_envs_idx_cache`` is allocated lazily on the first apply(), on the same
+    device as ``_current_value`` — this keeps the perturbation portable between
+    CPU and CUDA Genesis backends.
     """
 
     def __init__(self, setter_fn: Callable[[Tensor, Tensor], None], **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.setter_fn = setter_fn
+        self._last_applied: Tensor | None = None
+        self._last_applied_version: int = -1
+        self._envs_idx_cache: Tensor | None = None
+
+    def reset(self, env_ids: Tensor) -> None:
+        super().reset(env_ids)
+        self._last_applied = None
+        self._last_applied_version = -1
 
     def apply(self, scene: Any, drone: Any, env_state: EnvState) -> None:
         assert self._current_value is not None, "call tick() before apply()"
-        envs_idx = torch.arange(self.n_envs)
-        self.setter_fn(self._current_value, envs_idx)
+        cur = self._current_value
+        if self._last_applied is cur and self._last_applied_version == cur._version:
+            return
+        if self._envs_idx_cache is None or self._envs_idx_cache.device != cur.device:
+            self._envs_idx_cache = torch.arange(self.n_envs, device=cur.device)
+        self.setter_fn(cur, self._envs_idx_cache)
+        self._last_applied = cur
+        self._last_applied_version = cur._version
 
 
 class ExternalWrenchPerturbation(PhysicsPerturbation, ABC):
