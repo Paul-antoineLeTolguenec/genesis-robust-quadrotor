@@ -31,6 +31,10 @@ dev = [
 genesis = [
     "genesis-world>=0.2",
 ]
+media = [
+    "imageio[pyav]>=2.30",
+    "pillow>=10.0",
+]
 
 [build-system]
 requires = ["hatchling"]
