@@ -4,12 +4,20 @@ version = "0.1.0"
 description = "Robust RL wrapper for quadrotor drones using Genesis simulator"
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [
+    {name = "Paul-Antoine Le Tolguenec", email = "letolguenecpa@gmail.com"},
+]
+keywords = ["reinforcement-learning", "robotics", "quadrotor", "genesis", "gymnasium", "adversarial-training", "domain-randomization"]
 dependencies = [
     "genesis-world>=0.4.0",
     "gymnasium>=0.29",
     "numpy>=1.24",
     "scipy>=1.11",
 ]
+
+[project.urls]
+Repository = "https://github.com/Paul-antoineLeTolguenec/genesis-robust-quadrotor"
+Issues = "https://github.com/Paul-antoineLeTolguenec/genesis-robust-quadrotor/issues"
 
 [project.optional-dependencies]
 dev = [
