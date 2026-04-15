@@ -96,8 +96,23 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [ ] Sim-to-real transfer experiments
 
 ## Phase 6 — Documentation & Release
+- [x] README showcase (badges, plots, quickstart) — PR #13
+- [x] Genesis hover demo GIFs (baseline vs wind_gust) — PR #14
+- [~] Scientific plot refactor (feat/phase6-plots-refactor)
+  - [x] Shared framework `docs/impl/_plot_framework.py` — CSV + meta JSON + unified Plotly template
+  - [x] Identity cache fix in `GenesisSetterPerturbation.apply()` (mass_shift overhead +60% → +1%)
+  - [x] Pilot Cat 1 `mass_shift` (curriculum + per_env + perf) with real Genesis perf measurement
+  - [x] Cat 6 action — 5/5 (curriculum + per_env + effect plots)
+  - [x] Cat 7 payload — 3/3 (curriculum + per_env + bar chart)
+  - [x] Cat 8 external — 2/2 (constant curriculum + OU trace + spectrum + autocorrelation)
+  - [ ] Cat 1 physics — 14 remaining (mass_shift shipped as pilot)
+  - [ ] Cat 2 motor — 13 perturbations
+  - [ ] Cat 3 temporal — 6 perturbations (heatmaps)
+  - [ ] Cat 4 sensor — 16 perturbations (distributions + spectra + heatmaps)
+  - [ ] Cat 5 wind — 9 perturbations (traces + spectra + gust heatmap)
+  - [ ] Regenerate Genesis perf measurements across all cats (sequential, single-process)
+  - [ ] README rewrite with benchmark methodology + hardware-annotated plots
 - [ ] Perturbation registry + auto-doc API
-- [ ] README with quickstart
 - [ ] Full API reference
 - [ ] Example notebooks
 - [ ] PyPI release
@@ -112,23 +127,22 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 5 — Robust RL Contribution** — PARTIALLY COMPLETED
+**Phase 6 — Documentation & Release** — IN PROGRESS
 
-**Phase 4 COMPLETED** — `AdversarialEnv` wrapper (37 tests), PR #10.
+**Scientific plot refactor (feat/phase6-plots-refactor):**
+- Shared framework in `docs/impl/_plot_framework.py`: CSV raw data logged BEFORE PNG,
+  meta JSON with hardware snapshot (CPU / cores / threads / RAM / OS / git SHA / date),
+  unified Plotly template, stats (median / mean / σ / IQR / min / max) with Tukey method documented.
+- Identity-cache optimization in `GenesisSetterPerturbation.apply()` — mass_shift overhead
+  dropped from +40–60% to +0.5–2% across n_envs ∈ {1, 4, 16, 64, 128} on Apple M4 Pro / CPU.
+- 3 categories shipped: **Cat 6 action** (15 PNGs), **Cat 7 payload** (9 PNGs),
+  **Cat 8 external** (8 PNGs incl. OU trace + spectrum + autocorrelation).
+- Pilot Cat 1 `mass_shift` validated the full pipeline (curriculum + per_env + Genesis perf).
+- Remaining: Cat 1 (14 perts), Cat 2 (13), Cat 3 (6), Cat 4 (16), Cat 5 (9) — will be done
+  sequentially in follow-up PRs, one category per PR.
 
-**Phase 5 progress:**
-- `AdversarialAgent` Protocol + `RolloutData` dataclass
-- `ActorCritic` shared MLP (Gaussian policy + value head)
-- `PPOAgent` reference PPO with GAE
-- `CurriculumScheduler` (linear/cosine/step schedules, callback)
-- `train()` loop — DR / RARL (alternating) / RAP (joint) modes
-- `privileged_obs_dim` property on `RobustDroneEnv`
-- `env_ids` support added to `AdversarialEnv.reset()`
-- Design doc `docs/07_adversarial_training.md` — 2-agent review, 4 BLOCKING fixed
-- 32 new tests passed, 3144 total suite, 0 regressions
-
-**Remaining Phase 5 items:**
+**Phase 5 deferred items:**
 - Benchmarks vs DR classical / minimax / DRRL
 - Sim-to-real transfer experiments (requires hardware)
 
-**Immediate next action:** Benchmarks or Phase 6 (docs & release).
+**Immediate next action:** merge current PR, then resume rollout Cat 3 → Cat 5 → Cat 2 → Cat 1 → Cat 4.
