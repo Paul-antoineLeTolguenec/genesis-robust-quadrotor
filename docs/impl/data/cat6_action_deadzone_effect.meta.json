@@ -1,0 +1,49 @@
+{
+  "name": "cat6_action_deadzone_effect",
+  "category": 6,
+  "metric": "deadzone output vs input ramp",
+  "unit": "dimensionless",
+  "baseline": "|a| < threshold \u2192 0; else pass-through",
+  "config": {
+    "n_envs_shown": 4,
+    "thresholds_used": [
+      0.009999999776482582,
+      0.019999999552965164,
+      0.03500000014901161,
+      0.05000000074505806
+    ],
+    "action_dim": 4
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T07:12:55+00:00"
+  },
+  "stats": {
+    "output_all": {
+      "n": 1600,
+      "median": 0.0,
+      "mean": 0.0,
+      "stdev": 0.11547487315908424,
+      "q1": -0.10000000521540642,
+      "q3": 0.10000000521540642,
+      "iqr": 0.20000001043081284,
+      "min": -0.20000000298023224,
+      "max": 0.20000000298023224
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1600
+}
