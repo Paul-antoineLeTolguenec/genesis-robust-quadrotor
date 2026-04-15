@@ -1,0 +1,92 @@
+{
+  "name": "cat7_asymmetric_prop_guard_drag_curriculum",
+  "category": 7,
+  "metric": "max arm drag deviation",
+  "unit": "dimensionless",
+  "baseline": "curriculum=0 collapses to nominal ratios = 1",
+  "config": {
+    "distribution": "uniform",
+    "bounds": [
+      0.8,
+      1.2
+    ],
+    "n_envs": 256,
+    "draws_per_env": 40
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T06:53:01+00:00"
+  },
+  "stats": {
+    "0.00": {
+      "n": 10240,
+      "median": 0.0,
+      "mean": 0.0,
+      "stdev": 0.0,
+      "q1": 0.0,
+      "q3": 0.0,
+      "iqr": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "0.25": {
+      "n": 10240,
+      "median": 0.04218572378158569,
+      "mean": 0.04010704417596571,
+      "stdev": 0.008131237829028474,
+      "q1": 0.03529819846153259,
+      "q3": 0.046603068709373474,
+      "iqr": 0.011304870247840881,
+      "min": 0.004933357238769531,
+      "max": 0.04999840259552002
+    },
+    "0.50": {
+      "n": 10240,
+      "median": 0.08397233486175537,
+      "mean": 0.07990428316406906,
+      "stdev": 0.016403065559385786,
+      "q1": 0.07060013711452484,
+      "q3": 0.093081533908844,
+      "iqr": 0.022481396794319153,
+      "min": 0.010266304016113281,
+      "max": 0.09999680519104004
+    },
+    "0.75": {
+      "n": 10240,
+      "median": 0.12607568502426147,
+      "mean": 0.11994264487293549,
+      "stdev": 0.024637265171804066,
+      "q1": 0.10571101307868958,
+      "q3": 0.13978245854377747,
+      "iqr": 0.03407144546508789,
+      "min": 0.018227100372314453,
+      "max": 0.1499994397163391
+    },
+    "1.00": {
+      "n": 10240,
+      "median": 0.16872572898864746,
+      "mean": 0.16045998478657567,
+      "stdev": 0.032666024487207033,
+      "q1": 0.14206132292747498,
+      "q3": 0.18654298782348633,
+      "iqr": 0.04448166489601135,
+      "min": 0.010973095893859863,
+      "max": 0.19999855756759644
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 51200
+}
