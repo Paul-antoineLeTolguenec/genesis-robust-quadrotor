@@ -1,0 +1,47 @@
+{
+  "name": "cat8_body_force_disturbance_ou_autocorr",
+  "category": 8,
+  "metric": "autocorrelation (OU mode)",
+  "unit": "dimensionless",
+  "baseline": "empirical vs theoretical exp(-\u03b8\u00b7\u03c4) with \u03b8=1.0",
+  "config": {
+    "distribution": "ou_process",
+    "n_envs": 4,
+    "n_steps": 2048,
+    "dt_s": 0.01,
+    "max_lag_steps": 300,
+    "theta": 1.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T06:28:41+00:00"
+  },
+  "stats": {
+    "acf_excluding_zero": {
+      "n": 300,
+      "median": 0.027382646199839655,
+      "mean": 0.16859277447250862,
+      "stdev": 0.25808828047363774,
+      "q1": 0.0006382609135471284,
+      "q3": 0.2881901003420353,
+      "iqr": 0.28755183942848817,
+      "min": -0.09597020363435149,
+      "max": 0.9821669608354568
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 301
+}
