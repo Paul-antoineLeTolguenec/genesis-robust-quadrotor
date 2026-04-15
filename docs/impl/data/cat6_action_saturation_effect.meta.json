@@ -1,0 +1,49 @@
+{
+  "name": "cat6_action_saturation_effect",
+  "category": 6,
+  "metric": "saturation output vs input ramp",
+  "unit": "dimensionless",
+  "baseline": "clamp(a, -limit, limit) per env",
+  "config": {
+    "n_envs_shown": 4,
+    "limits_used": [
+      0.5,
+      0.699999988079071,
+      0.8500000238418579,
+      1.0
+    ],
+    "action_dim": 4
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T07:12:55+00:00"
+  },
+  "stats": {
+    "output_all": {
+      "n": 1600,
+      "median": 0.0,
+      "mean": 0.0,
+      "stdev": 0.5721612923090825,
+      "q1": -0.5,
+      "q3": 0.5,
+      "iqr": 1.0,
+      "min": -1.0,
+      "max": 1.0
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1600
+}

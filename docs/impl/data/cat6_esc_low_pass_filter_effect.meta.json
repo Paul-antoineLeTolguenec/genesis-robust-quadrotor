@@ -1,0 +1,51 @@
+{
+  "name": "cat6_esc_low_pass_filter_effect",
+  "category": 6,
+  "metric": "step response",
+  "unit": "dimensionless",
+  "baseline": "y += (x \u2212 y)\u00b7\u03b1, \u03b1 = 2\u03c0\u00b7f_c\u00b7dt clamped to [0, 1]",
+  "config": {
+    "n_envs_shown": 4,
+    "cutoffs_hz_used": [
+      2.0,
+      5.0,
+      10.0,
+      20.0
+    ],
+    "input_signal": "unit step at step=50",
+    "n_steps": 400,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T07:12:55+00:00"
+  },
+  "stats": {
+    "output_all": {
+      "n": 1600,
+      "median": 0.9999999403953552,
+      "mean": 0.8689172161277383,
+      "stdev": 0.3325209757853631,
+      "q1": 0.9999998211860657,
+      "q3": 1.0,
+      "iqr": 1.7881393432617188e-07,
+      "min": 0.0,
+      "max": 1.0
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1600
+}
