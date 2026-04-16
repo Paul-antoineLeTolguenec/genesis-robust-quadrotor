@@ -1,0 +1,70 @@
+{
+  "name": "cat5_proximity_force_vs_distance",
+  "category": 5,
+  "metric": "proximity force vs distance",
+  "unit": "N",
+  "baseline": "quadratic repulsive force within d_max radius",
+  "config": {
+    "f_maxes": [
+      0.1,
+      0.25,
+      0.5
+    ],
+    "d_max": 0.3,
+    "surface_distance": 2.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "F_max=0.1N": {
+      "n": 100,
+      "median": -0.0027848636964336038,
+      "mean": -0.02030280473817129,
+      "stdev": 0.028891251518165635,
+      "q1": -0.034033083356916904,
+      "q3": 0.0,
+      "iqr": 0.034033083356916904,
+      "min": -0.10000000149011612,
+      "max": 0.0
+    },
+    "F_max=0.25N": {
+      "n": 100,
+      "median": -0.0069621591828763485,
+      "mean": -0.050757010938204984,
+      "stdev": 0.07222812735695412,
+      "q1": -0.08508270420134068,
+      "q3": 0.0,
+      "iqr": 0.08508270420134068,
+      "min": -0.25,
+      "max": 0.0
+    },
+    "F_max=0.5N": {
+      "n": 100,
+      "median": -0.013924318365752697,
+      "mean": -0.10151402187640997,
+      "stdev": 0.14445625471390824,
+      "q1": -0.17016540840268135,
+      "q3": 0.0,
+      "iqr": 0.17016540840268135,
+      "min": -0.5,
+      "max": 0.0
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 300
+}

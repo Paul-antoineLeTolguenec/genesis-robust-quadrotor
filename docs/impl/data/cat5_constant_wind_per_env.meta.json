@@ -1,0 +1,43 @@
+{
+  "name": "cat5_constant_wind_per_env",
+  "category": 5,
+  "metric": "per-env wind velocity",
+  "unit": "m/s",
+  "baseline": "per-axis wind sampled once per episode",
+  "config": {
+    "n_envs": 16,
+    "curriculum_scale": 1.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "magnitude": {
+      "n": 16,
+      "median": 5.310010671615601,
+      "mean": 5.3162480890750885,
+      "stdev": 0.9565425074632776,
+      "q1": 4.609477162361145,
+      "q3": 6.110279083251953,
+      "iqr": 1.500801920890808,
+      "min": 3.395878314971924,
+      "max": 7.058244705200195
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 48
+}

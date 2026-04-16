@@ -1,0 +1,221 @@
+{
+  "name": "cat3_action_fixed_delay_heatmap",
+  "category": 3,
+  "metric": "action delay (fixed) per env\u00d7episode",
+  "unit": "steps",
+  "baseline": "integer delay sampled uniformly at each episode reset",
+  "config": {
+    "n_envs": 16,
+    "n_episodes": 30,
+    "curriculum_scale": 1.0,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:37:23+00:00"
+  },
+  "stats": {
+    "env_0": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.466666666666667,
+      "stdev": 1.3829836145670416,
+      "q1": 1.0,
+      "q3": 3.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_1": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.2,
+      "stdev": 1.6484057083468089,
+      "q1": 1.0,
+      "q3": 3.75,
+      "iqr": 2.75,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_2": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.033333333333333,
+      "stdev": 1.4015590662158888,
+      "q1": 1.0,
+      "q3": 3.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_3": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.566666666666667,
+      "stdev": 1.6333450621206846,
+      "q1": 1.25,
+      "q3": 4.0,
+      "iqr": 2.75,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_4": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.7,
+      "stdev": 1.290549201456229,
+      "q1": 2.0,
+      "q3": 3.75,
+      "iqr": 1.75,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_5": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.6666666666666665,
+      "stdev": 1.5387709679981694,
+      "q1": 2.0,
+      "q3": 4.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_6": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.6666666666666665,
+      "stdev": 1.5610194134588469,
+      "q1": 2.0,
+      "q3": 4.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_7": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.7,
+      "stdev": 1.393333883297477,
+      "q1": 2.0,
+      "q3": 4.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_8": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.6666666666666665,
+      "stdev": 1.6470105276411926,
+      "q1": 1.25,
+      "q3": 4.0,
+      "iqr": 2.75,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_9": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.9,
+      "stdev": 1.561387535009409,
+      "q1": 2.0,
+      "q3": 4.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_10": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.2333333333333334,
+      "stdev": 1.4546793303071948,
+      "q1": 1.0,
+      "q3": 3.75,
+      "iqr": 2.75,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_11": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.2,
+      "stdev": 1.2148506364839742,
+      "q1": 1.0,
+      "q3": 3.0,
+      "iqr": 2.0,
+      "min": 1.0,
+      "max": 5.0
+    },
+    "env_12": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.066666666666667,
+      "stdev": 1.5521583045227219,
+      "q1": 1.0,
+      "q3": 3.0,
+      "iqr": 2.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_13": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.3333333333333335,
+      "stdev": 1.7681732894739688,
+      "q1": 1.0,
+      "q3": 4.0,
+      "iqr": 3.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_14": {
+      "n": 30,
+      "median": 2.0,
+      "mean": 2.566666666666667,
+      "stdev": 1.4307782626184986,
+      "q1": 1.25,
+      "q3": 3.75,
+      "iqr": 2.5,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "env_15": {
+      "n": 30,
+      "median": 3.0,
+      "mean": 2.533333333333333,
+      "stdev": 1.3829836145670416,
+      "q1": 2.0,
+      "q3": 3.0,
+      "iqr": 1.0,
+      "min": 0.0,
+      "max": 5.0
+    },
+    "all": {
+      "n": 480,
+      "median": 2.0,
+      "mean": 2.46875,
+      "stdev": 1.4956661470335035,
+      "q1": 1.0,
+      "q3": 4.0,
+      "iqr": 3.0,
+      "min": 0.0,
+      "max": 5.0
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 480
+}

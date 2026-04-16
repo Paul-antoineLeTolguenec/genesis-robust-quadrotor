@@ -1,0 +1,45 @@
+{
+  "name": "cat5_turbulence_spectrum",
+  "category": 5,
+  "metric": "power spectrum",
+  "unit": "m/s\u00b2/Hz",
+  "baseline": "OU vs white-noise flat reference",
+  "config": {
+    "n_envs": 4,
+    "n_steps": 2048,
+    "dt_s": 0.01,
+    "fs_hz": 100.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "ou_power_no_dc": {
+      "n": 1024,
+      "median": 0.008289165284886463,
+      "mean": 0.5778980512131965,
+      "stdev": 5.080347822592309,
+      "q1": 0.004291845178373386,
+      "q3": 0.025123668798555494,
+      "iqr": 0.020831823620182106,
+      "min": 0.00040234218913964153,
+      "max": 104.91732680583152
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1025
+}

@@ -1,0 +1,44 @@
+{
+  "name": "cat2_motor_kill_heatmap",
+  "category": 2,
+  "metric": "kill mask",
+  "unit": "boolean",
+  "baseline": "1=killed, 0=alive",
+  "config": {
+    "n_envs": 16,
+    "curriculum_scale": 1.0,
+    "max_killed": 2
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T09:34:48+00:00"
+  },
+  "stats": {
+    "kill_rate": {
+      "n": 16,
+      "median": 0.25,
+      "mean": 0.265625,
+      "stdev": 0.19297560294849017,
+      "q1": 0.1875,
+      "q3": 0.5,
+      "iqr": 0.3125,
+      "min": 0.0,
+      "max": 0.5
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 64
+}

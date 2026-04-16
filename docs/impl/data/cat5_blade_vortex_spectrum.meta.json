@@ -1,0 +1,45 @@
+{
+  "name": "cat5_blade_vortex_spectrum",
+  "category": 5,
+  "metric": "power spectrum",
+  "unit": "fraction\u00b2/Hz",
+  "baseline": "OU vs white-noise flat reference",
+  "config": {
+    "n_envs": 4,
+    "n_steps": 2048,
+    "dt_s": 0.01,
+    "fs_hz": 100.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "ou_power_no_dc": {
+      "n": 1024,
+      "median": 2.911600009735315e-06,
+      "mean": 0.00010920958713180191,
+      "stdev": 0.0007345258273724403,
+      "q1": 1.4994594283127868e-06,
+      "q3": 9.024909443393183e-06,
+      "iqr": 7.525450015080396e-06,
+      "min": 1.4065873835982933e-07,
+      "max": 0.010929468399943763
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1025
+}

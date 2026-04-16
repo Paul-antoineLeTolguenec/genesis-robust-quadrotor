@@ -1,0 +1,42 @@
+{
+  "name": "cat5_ground_effect_per_env",
+  "category": 5,
+  "metric": "rotor diameter per env",
+  "unit": "m",
+  "baseline": "sampled uniformly \u2208 [0.07, 0.15] m",
+  "config": {
+    "n_envs": 16
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "diameter": {
+      "n": 16,
+      "median": 0.1116938665509224,
+      "mean": 0.1090866974554956,
+      "stdev": 0.022173603065469633,
+      "q1": 0.09136132150888443,
+      "q3": 0.1294219121336937,
+      "iqr": 0.038060590624809265,
+      "min": 0.07325361669063568,
+      "max": 0.13735294342041016
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 16
+}
