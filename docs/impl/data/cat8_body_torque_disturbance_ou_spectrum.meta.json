@@ -1,0 +1,46 @@
+{
+  "name": "cat8_body_torque_disturbance_ou_spectrum",
+  "category": 8,
+  "metric": "power spectrum (OU mode)",
+  "unit": "N\u00b7m\u00b2/Hz",
+  "baseline": "OU vs white-noise flat reference at same variance",
+  "config": {
+    "distribution": "ou_process",
+    "n_envs": 4,
+    "n_steps": 2048,
+    "dt_s": 0.01,
+    "fs_hz": 100.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T06:28:41+00:00"
+  },
+  "stats": {
+    "ou_power_no_dc": {
+      "n": 1024,
+      "median": 0.00021370445733737142,
+      "mean": 0.014401265908301564,
+      "stdev": 0.1385347094228705,
+      "q1": 0.00010772566125893945,
+      "q3": 0.0006994424230697405,
+      "iqr": 0.000591716761810801,
+      "min": 7.170464435546364e-06,
+      "max": 2.5428900653496385
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1025
+}

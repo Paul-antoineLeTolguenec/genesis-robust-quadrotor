@@ -1,0 +1,51 @@
+{
+  "name": "cat3_computation_overload_duration_hist",
+  "category": 3,
+  "metric": "stall duration",
+  "unit": "steps",
+  "baseline": "stall duration sampled uniformly \u2208 [duration_low, duration_high]",
+  "config": {
+    "n_envs": 8,
+    "n_steps": 300,
+    "curriculum_scale": 1.0,
+    "distribution_params": {
+      "prob_low": 0.0,
+      "prob_high": 0.1,
+      "duration_low": 1,
+      "duration_high": 5
+    },
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:37:23+00:00"
+  },
+  "stats": {
+    "duration": {
+      "n": 107,
+      "median": 3.0,
+      "mean": 2.94392523364486,
+      "stdev": 1.5285446012893575,
+      "q1": 2.0,
+      "q3": 4.5,
+      "iqr": 2.5,
+      "min": 1.0,
+      "max": 5.0
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 107
+}

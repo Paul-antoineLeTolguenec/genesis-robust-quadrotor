@@ -1,0 +1,69 @@
+{
+  "name": "cat5_ground_effect_altitude_sweep",
+  "category": 5,
+  "metric": "ground effect force vs altitude",
+  "unit": "N",
+  "baseline": "Cheeseman-Bennett model, zeroed above 3\u00d7diameter",
+  "config": {
+    "diameters": [
+      0.06,
+      0.092,
+      0.15
+    ],
+    "n_points": 100
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "D=0.06m": {
+      "n": 100,
+      "median": 0.0,
+      "mean": 0.0034304473391966895,
+      "stdev": 0.013419936257214831,
+      "q1": 0.0,
+      "q3": 0.00085205037612468,
+      "iqr": 0.00085205037612468,
+      "min": 0.0,
+      "max": 0.0882900059223175
+    },
+    "D=0.092m": {
+      "n": 100,
+      "median": 0.0005399476503953338,
+      "mean": 0.005864511056279298,
+      "stdev": 0.017451990416096606,
+      "q1": 0.0,
+      "q3": 0.0020120434928685427,
+      "iqr": 0.0020120434928685427,
+      "min": 0.0,
+      "max": 0.0882900059223175
+    },
+    "D=0.15m": {
+      "n": 100,
+      "median": 0.001440228777937591,
+      "mean": 0.010425817217910662,
+      "stdev": 0.022852755897201316,
+      "q1": 0.0006551173137268052,
+      "q3": 0.005416953237727284,
+      "iqr": 0.004761835924000479,
+      "min": 0.0,
+      "max": 0.0882900059223175
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 300
+}

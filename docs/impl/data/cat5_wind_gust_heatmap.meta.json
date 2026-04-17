@@ -1,0 +1,45 @@
+{
+  "name": "cat5_wind_gust_heatmap",
+  "category": 5,
+  "metric": "gust events (binary)",
+  "unit": "boolean",
+  "baseline": "1=gust active, 0=calm",
+  "config": {
+    "n_envs": 8,
+    "n_steps": 400,
+    "curriculum_scale": 1.0,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "gust_active_rate": {
+      "n": 8,
+      "median": 0.3349999934434891,
+      "mean": 0.3362499997019768,
+      "stdev": 0.08105333345894145,
+      "q1": 0.26875000447034836,
+      "q3": 0.3724999949336052,
+      "iqr": 0.10374999046325684,
+      "min": 0.24500000476837158,
+      "max": 0.46000000834465027
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 3200
+}

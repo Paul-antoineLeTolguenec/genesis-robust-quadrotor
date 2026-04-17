@@ -1,0 +1,45 @@
+{
+  "name": "cat3_computation_overload_heatmap",
+  "category": 3,
+  "metric": "stall events (binary)",
+  "unit": "boolean",
+  "baseline": "1=stalled (ZOH active), 0=normal",
+  "config": {
+    "n_envs": 8,
+    "n_steps": 300,
+    "curriculum_scale": 1.0,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:37:23+00:00"
+  },
+  "stats": {
+    "stall_rate_per_env": {
+      "n": 8,
+      "median": 0.1433333307504654,
+      "mean": 0.14208333007991314,
+      "stdev": 0.02550676852760234,
+      "q1": 0.13749999925494194,
+      "q3": 0.14666666090488434,
+      "iqr": 0.009166661649942398,
+      "min": 0.09666666388511658,
+      "max": 0.1899999976158142
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 2400
+}

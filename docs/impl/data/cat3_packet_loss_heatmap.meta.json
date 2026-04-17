@@ -1,0 +1,45 @@
+{
+  "name": "cat3_packet_loss_heatmap",
+  "category": 3,
+  "metric": "drop events (binary)",
+  "unit": "boolean",
+  "baseline": "1=dropped (ZOH active), 0=passed",
+  "config": {
+    "n_envs": 8,
+    "n_steps": 300,
+    "curriculum_scale": 1.0,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:37:23+00:00"
+  },
+  "stats": {
+    "drop_rate_per_env": {
+      "n": 8,
+      "median": 0.13833333551883698,
+      "mean": 0.14000000152736902,
+      "stdev": 0.01745743042221317,
+      "q1": 0.13333333656191826,
+      "q3": 0.1483333297073841,
+      "iqr": 0.01499999314546585,
+      "min": 0.1133333370089531,
+      "max": 0.17000000178813934
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 2400
+}

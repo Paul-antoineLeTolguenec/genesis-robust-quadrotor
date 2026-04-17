@@ -1,0 +1,46 @@
+{
+  "name": "cat6_actuator_hysteresis_effect",
+  "category": 6,
+  "metric": "Lissajous output vs input",
+  "unit": "dimensionless",
+  "baseline": "width amplified to 0.06 for visibility; nominal \u2208 [0, 0.03]",
+  "config": {
+    "n_envs_shown": 1,
+    "width_amplified": 0.06,
+    "input_signal": "sin(2\u03c0\u00b7step/100)",
+    "width_scale_factor": 20,
+    "n_steps": 400
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T07:12:55+00:00"
+  },
+  "stats": {
+    "output": {
+      "n": 400,
+      "median": -0.004508495330810547,
+      "mean": -0.0007500000298023224,
+      "stdev": 0.7767127208349123,
+      "q1": -0.6350964903831482,
+      "q3": 0.6350964903831482,
+      "iqr": 1.2701929807662964,
+      "min": -1.2999999523162842,
+      "max": 1.2999999523162842
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 400
+}

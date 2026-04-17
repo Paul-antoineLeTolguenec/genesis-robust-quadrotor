@@ -1,0 +1,45 @@
+{
+  "name": "cat6_action_noise_effect",
+  "category": 6,
+  "metric": "noisy output vs zero input",
+  "unit": "dimensionless",
+  "baseline": "input constant at 0; output is pure noise centered at 0",
+  "config": {
+    "n_envs_shown": 4,
+    "n_steps": 400,
+    "action_dim": 4,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "d2f33eab986c9e48b56083ad0b6404ace997cc30",
+    "git_dirty": true,
+    "date_utc": "2026-04-15T07:12:55+00:00"
+  },
+  "stats": {
+    "output_all_envs_channel0": {
+      "n": 6400,
+      "median": -0.00023223149037221447,
+      "mean": -0.0004979653813562646,
+      "stdev": 0.029014776088003666,
+      "q1": -0.013595102122053504,
+      "q3": 0.012254837667569518,
+      "iqr": 0.025849939789623022,
+      "min": -0.14527828991413116,
+      "max": 0.1633414477109909
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 1600
+}

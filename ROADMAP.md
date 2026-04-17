@@ -96,8 +96,23 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [ ] Sim-to-real transfer experiments
 
 ## Phase 6 — Documentation & Release
+- [x] README showcase (badges, plots, quickstart) — PR #13
+- [x] Genesis hover demo GIFs (baseline vs wind_gust) — PR #14
+- [~] Scientific plot refactor (feat/phase6-plots-refactor)
+  - [x] Shared framework `docs/impl/_plot_framework.py` — CSV + meta JSON + unified Plotly template
+  - [x] Identity cache fix in `GenesisSetterPerturbation.apply()` (mass_shift overhead +60% → +1%)
+  - [x] Pilot Cat 1 `mass_shift` (curriculum + per_env + perf) with real Genesis perf measurement
+  - [x] Cat 6 action — 5/5 (curriculum + per_env + effect plots)
+  - [x] Cat 7 payload — 3/3 (curriculum + per_env + bar chart)
+  - [x] Cat 8 external — 2/2 (constant curriculum + OU trace + spectrum + autocorrelation)
+  - [x] Cat 1 physics — 14 remaining (curriculum violins + ground_effect sweep + battery_sag trace)
+  - [x] Cat 2 motor — 13 (curriculum violins + motor_kill heatmap + wear/imbalance/cold_start traces)
+  - [x] Cat 3 temporal — 6 (curriculum violins + delay heatmaps + packet_loss/overload event heatmaps)
+  - [x] Cat 4 sensor — 16 (curriculum violins + OU drift traces + dropout/outlier event heatmaps)
+  - [x] Cat 5 wind — 9 (curriculum violins + OU traces/spectra + gust heatmap + phase-space)
+  - [ ] Regenerate Genesis perf measurements across all cats (sequential, single-process)
+  - [ ] README rewrite with benchmark methodology + hardware-annotated plots
 - [ ] Perturbation registry + auto-doc API
-- [ ] README with quickstart
 - [ ] Full API reference
 - [ ] Example notebooks
 - [ ] PyPI release
@@ -112,23 +127,22 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ---
 
 ## Current milestone
-**Phase 5 — Robust RL Contribution** — PARTIALLY COMPLETED
+**Phase 6 — Documentation & Release** — IN PROGRESS
 
-**Phase 4 COMPLETED** — `AdversarialEnv` wrapper (37 tests), PR #10.
+**Scientific plot refactor (feat/phase6-plots-refactor) — ALL 8 CATEGORIES COMPLETE:**
+- 123 PNG + 123 CSV + 123 meta.json across 69 perturbations on Apple M4 Pro / CPU.
+- Shared framework `_plot_framework.py`: CSV-first pipeline, hardware footer, Tukey stats.
+- Identity-cache fix: mass_shift overhead +60% → +1%.
+- Per-category visualizations: curriculum violins, OU traces/spectra, event heatmaps,
+  delay heatmaps, phase-space portraits, altitude sweeps, Lipschitz enforcement,
+  duration histograms, cumulative rates, battery SoC decay.
 
-**Phase 5 progress:**
-- `AdversarialAgent` Protocol + `RolloutData` dataclass
-- `ActorCritic` shared MLP (Gaussian policy + value head)
-- `PPOAgent` reference PPO with GAE
-- `CurriculumScheduler` (linear/cosine/step schedules, callback)
-- `train()` loop — DR / RARL (alternating) / RAP (joint) modes
-- `privileged_obs_dim` property on `RobustDroneEnv`
-- `env_ids` support added to `AdversarialEnv.reset()`
-- Design doc `docs/07_adversarial_training.md` — 2-agent review, 4 BLOCKING fixed
-- 32 new tests passed, 3144 total suite, 0 regressions
+**Remaining Phase 6 items:**
+- Genesis perf measurements across all cats (sequential, single-process)
+- README rewrite with benchmark methodology + hardware-annotated plots
 
-**Remaining Phase 5 items:**
+**Phase 5 deferred items:**
 - Benchmarks vs DR classical / minimax / DRRL
 - Sim-to-real transfer experiments (requires hardware)
 
-**Immediate next action:** Benchmarks or Phase 6 (docs & release).
+**Immediate next action:** merge PR #15, then Genesis perf regen + README rewrite.

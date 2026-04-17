@@ -1,0 +1,55 @@
+{
+  "name": "cat5_adversarial_wind_lipschitz",
+  "category": 5,
+  "metric": "Lipschitz-constrained tracking",
+  "unit": "m/s",
+  "baseline": "smooth ramp to target, bounded by lipschitz_k\u00d7dt per step",
+  "config": {
+    "n_steps": 300,
+    "lipschitz_k": 5.0,
+    "dt_s": 0.01
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "target": {
+      "n": 300,
+      "median": 1.1768978857888024,
+      "mean": 0.5810213666434679,
+      "stdev": 3.5493837323238533,
+      "q1": -2.9344344413251484,
+      "q3": 4.04863089531018,
+      "iqr": 6.983065336635328,
+      "min": -4.9999510327535175,
+      "max": 4.999960366529594
+    },
+    "actual": {
+      "n": 300,
+      "median": 0.5945937393197627,
+      "mean": 0.6020028377844936,
+      "stdev": 0.9760008070815754,
+      "q1": -0.1637326762435257,
+      "q3": 1.3418906089796445,
+      "iqr": 1.5056232852231701,
+      "min": -1.3108125213604753,
+      "max": 2.577506859107321
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 300
+}

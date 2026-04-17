@@ -1,0 +1,77 @@
+{
+  "name": "cat2_rotor_imbalance_trace",
+  "category": 2,
+  "metric": "RPM modulation",
+  "unit": "RPM",
+  "baseline": "rpm \u00d7 (1 + mag \u00d7 sin(phase)), phase advancing at rotor \u03c9",
+  "config": {
+    "n_envs": 4,
+    "n_steps": 200,
+    "rpm_commanded": 15000.0
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T09:33:51+00:00"
+  },
+  "stats": {
+    "env_0": {
+      "n": 200,
+      "median": 15000.001953125,
+      "mean": 15000.001030273437,
+      "stdev": 15.460815718775429,
+      "q1": 14984.538330078125,
+      "q3": 15015.465576171875,
+      "iqr": 30.92724609375,
+      "min": 14984.4208984375,
+      "max": 15015.580078125
+    },
+    "env_1": {
+      "n": 200,
+      "median": 15000.00048828125,
+      "mean": 15000.000043945312,
+      "stdev": 124.14122556700092,
+      "q1": 14876.1708984375,
+      "q3": 15123.8291015625,
+      "iqr": 247.658203125,
+      "min": 14876.15625,
+      "max": 15123.8447265625
+    },
+    "env_2": {
+      "n": 200,
+      "median": 14999.99853515625,
+      "mean": 14999.997646484375,
+      "stdev": 343.28047787213836,
+      "q1": 14657.676025390625,
+      "q3": 15342.316162109375,
+      "iqr": 684.64013671875,
+      "min": 14656.9560546875,
+      "max": 15343.037109375
+    },
+    "env_3": {
+      "n": 200,
+      "median": 15000.00048828125,
+      "mean": 14999.999135742188,
+      "stdev": 18.734026882491346,
+      "q1": 14981.346435546875,
+      "q3": 15018.650146484375,
+      "iqr": 37.3037109375,
+      "min": 14981.080078125,
+      "max": 15018.9189453125
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 800
+}

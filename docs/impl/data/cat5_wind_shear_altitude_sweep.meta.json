@@ -1,0 +1,70 @@
+{
+  "name": "cat5_wind_shear_altitude_sweep",
+  "category": 5,
+  "metric": "wind shear force vs altitude",
+  "unit": "N",
+  "baseline": "quadratic force = drag_coeff \u00d7 (gradient \u00d7 altitude)\u00b2",
+  "config": {
+    "gradients": [
+      0.3,
+      0.75,
+      1.5
+    ],
+    "n_points": 100,
+    "drag_coeff": 0.1
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "7929fc2ea4cad99a5309d245bffd67965b94ad5f",
+    "git_dirty": true,
+    "date_utc": "2026-04-16T08:58:24+00:00"
+  },
+  "stats": {
+    "grad=0.3": {
+      "n": 100,
+      "median": 0.020387278869748116,
+      "mean": 0.027225758843374023,
+      "stdev": 0.02451975587859997,
+      "q1": 0.005165795446373522,
+      "q3": 0.04566535260528326,
+      "iqr": 0.04049955715890974,
+      "min": 9.000000318337698e-07,
+      "max": 0.08100000768899918
+    },
+    "grad=0.75": {
+      "n": 100,
+      "median": 0.12742049247026443,
+      "mean": 0.17016097811495456,
+      "stdev": 0.15324845983220858,
+      "q1": 0.03228622069582343,
+      "q3": 0.28540846705436707,
+      "iqr": 0.25312224635854363,
+      "min": 5.625000085274223e-06,
+      "max": 0.5062500238418579
+    },
+    "grad=1.5": {
+      "n": 100,
+      "median": 0.5096819698810577,
+      "mean": 0.6806439124598183,
+      "stdev": 0.6129938393288343,
+      "q1": 0.12914488278329372,
+      "q3": 1.1416338682174683,
+      "iqr": 1.0124889854341745,
+      "min": 2.2500000341096893e-05,
+      "max": 2.0250000953674316
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 300
+}
