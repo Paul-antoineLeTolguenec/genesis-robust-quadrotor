@@ -1,0 +1,100 @@
+{
+  "name": "cat6_action_noise_perf",
+  "category": 6,
+  "metric": "overhead",
+  "unit": "%",
+  "baseline": "scene.step() only \u2014 no tick/apply call",
+  "config": {
+    "n_envs_range": [
+      1,
+      4,
+      16,
+      64,
+      128
+    ],
+    "warmup": 30,
+    "rounds": 5,
+    "steps_per_round": 100,
+    "reset_every": 20,
+    "genesis_backend": "cpu",
+    "drone_urdf": "urdf/drones/cf2x.urdf",
+    "dt_s": 0.005,
+    "apply_kind": "action"
+  },
+  "hardware": {
+    "cpu": "Apple M4 Pro",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "torch_num_threads": 10,
+    "memory_gb": 48.0,
+    "os": "Darwin",
+    "os_release": "25.4.0",
+    "hostname": "PLE-TOLGUENEC-MAC",
+    "python_version": "3.11.13",
+    "torch_version": "2.10.0",
+    "genesis_version": "0.4.0",
+    "backend": "cpu",
+    "git_sha": "9d57b0f1c87c4c07bd7dfbe780afd8c563c31d29",
+    "git_dirty": true,
+    "date_utc": "2026-04-17T09:46:11+00:00"
+  },
+  "stats": {
+    "n_envs_1": {
+      "n": 5,
+      "median": 15.651296595078193,
+      "mean": 15.73789065168829,
+      "stdev": 3.785393444491006,
+      "q1": 14.553521537890783,
+      "q3": 17.670541142570702,
+      "iqr": 3.1170196046799195,
+      "min": 10.310355299035221,
+      "max": 20.503738683866544
+    },
+    "n_envs_4": {
+      "n": 5,
+      "median": 16.157173793819798,
+      "mean": 16.964750103481677,
+      "stdev": 5.518183106458927,
+      "q1": 14.557867113355083,
+      "q3": 16.348954827921975,
+      "iqr": 1.791087714566892,
+      "min": 11.543615226941704,
+      "max": 26.21613955536982
+    },
+    "n_envs_16": {
+      "n": 5,
+      "median": 16.120623012004252,
+      "mean": 14.793960498676816,
+      "stdev": 6.0162830835385055,
+      "q1": 11.066137110548938,
+      "q3": 17.374996298603424,
+      "iqr": 6.308859188054486,
+      "min": 6.8794455832126,
+      "max": 22.528600489014863
+    },
+    "n_envs_64": {
+      "n": 5,
+      "median": 13.272614172656972,
+      "mean": 14.387202499061903,
+      "stdev": 4.470010372834229,
+      "q1": 11.073525207392782,
+      "q3": 18.185249734299227,
+      "iqr": 7.111724526906444,
+      "min": 9.550736387906591,
+      "max": 19.85388699305394
+    },
+    "n_envs_128": {
+      "n": 5,
+      "median": 11.204444077880044,
+      "mean": 11.845747604738095,
+      "stdev": 6.010865326956124,
+      "q1": 6.856780455476525,
+      "q3": 17.318516818706872,
+      "iqr": 10.461736363230347,
+      "min": 5.244029106014331,
+      "max": 18.604967565612704
+    }
+  },
+  "stats_method": "inclusive (Tukey quartiles, numpy-compatible for n>=2)",
+  "csv_rows": 25
+}

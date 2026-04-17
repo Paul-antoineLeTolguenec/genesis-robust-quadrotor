@@ -98,20 +98,12 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ## Phase 6 — Documentation & Release
 - [x] README showcase (badges, plots, quickstart) — PR #13
 - [x] Genesis hover demo GIFs (baseline vs wind_gust) — PR #14
-- [~] Scientific plot refactor (feat/phase6-plots-refactor)
-  - [x] Shared framework `docs/impl/_plot_framework.py` — CSV + meta JSON + unified Plotly template
-  - [x] Identity cache fix in `GenesisSetterPerturbation.apply()` (mass_shift overhead +60% → +1%)
-  - [x] Pilot Cat 1 `mass_shift` (curriculum + per_env + perf) with real Genesis perf measurement
-  - [x] Cat 6 action — 5/5 (curriculum + per_env + effect plots)
-  - [x] Cat 7 payload — 3/3 (curriculum + per_env + bar chart)
-  - [x] Cat 8 external — 2/2 (constant curriculum + OU trace + spectrum + autocorrelation)
-  - [x] Cat 1 physics — 14 remaining (curriculum violins + ground_effect sweep + battery_sag trace)
-  - [x] Cat 2 motor — 13 (curriculum violins + motor_kill heatmap + wear/imbalance/cold_start traces)
-  - [x] Cat 3 temporal — 6 (curriculum violins + delay heatmaps + packet_loss/overload event heatmaps)
-  - [x] Cat 4 sensor — 16 (curriculum violins + OU drift traces + dropout/outlier event heatmaps)
-  - [x] Cat 5 wind — 9 (curriculum violins + OU traces/spectra + gust heatmap + phase-space)
-  - [ ] Regenerate Genesis perf measurements across all cats (sequential, single-process)
-  - [ ] README rewrite with benchmark methodology + hardware-annotated plots
+- [x] Scientific plot refactor — PR #15 merged (shared framework + 123 viz PNG across 8 cats)
+- [~] Genesis perf regen (feat/phase6-perf-regen) — 69/69 perturbations, 207 artifacts
+  - [x] Shared `docs/impl/_perf_framework.py` — Genesis init + build_scene + measure_overhead
+  - [x] `plot_perf_cat{1..8}.py` — one script per category, unified methodology
+  - [x] 69 × (`_perf.csv` + `_perf.meta.json` + `_perf.png`) under `docs/impl/{data,assets}/`
+- [ ] README rewrite with benchmark methodology + hardware-annotated plots
 - [ ] Perturbation registry + auto-doc API
 - [ ] Full API reference
 - [ ] Example notebooks
@@ -129,20 +121,25 @@ Update status when starting (`in_progress`) and when done (`completed`).
 ## Current milestone
 **Phase 6 — Documentation & Release** — IN PROGRESS
 
-**Scientific plot refactor (feat/phase6-plots-refactor) — ALL 8 CATEGORIES COMPLETE:**
-- 123 PNG + 123 CSV + 123 meta.json across 69 perturbations on Apple M4 Pro / CPU.
-- Shared framework `_plot_framework.py`: CSV-first pipeline, hardware footer, Tukey stats.
-- Identity-cache fix: mass_shift overhead +60% → +1%.
-- Per-category visualizations: curriculum violins, OU traces/spectra, event heatmaps,
-  delay heatmaps, phase-space portraits, altitude sweeps, Lipschitz enforcement,
-  duration histograms, cumulative rates, battery SoC decay.
+**PR #15 merged**: scientific plot refactor — shared framework + 123 visualisation PNG/CSV/meta
+across 69 perturbations (Apple M4 Pro, CPU). Identity-cache fix on
+`GenesisSetterPerturbation.apply()` brought `mass_shift` from +60% → +1% overhead.
+
+**Genesis perf regen (feat/phase6-perf-regen) — 69/69 perturbations measured:**
+- Shared `_perf_framework.py` factors the canonical methodology
+  (warmup=30, rounds=5, steps=100, reset_every=20, n_envs ∈ {1, 4, 16, 64, 128})
+  across four apply kinds (physics / motor / obs / action).
+- One `plot_perf_cat<N>.py` per category → 69 × (`_perf.csv` + `_perf.meta.json` + `_perf.png`).
+- Key observations:
+  - GenesisSetter with identity cache: +1–8% (mass_shift, com_shift, payload_*, *_gain_*).
+  - ExternalWrench (no identity cache): +35–120% (all wind, all payload_drag, Cat 2 back-emf).
+  - InertiaTensor / ChassisGeometryAsymmetry trigger two setters per step → +100–130%.
+  - MotorCommand / ObservationPerturbation / ActionPerturbation: +0–30% typically.
 
 **Remaining Phase 6 items:**
-- Genesis perf measurements across all cats (sequential, single-process)
-- README rewrite with benchmark methodology + hardware-annotated plots
+- Open PR #16 (Genesis perf regen).
+- README rewrite with benchmark methodology + hardware-annotated plots.
 
 **Phase 5 deferred items:**
-- Benchmarks vs DR classical / minimax / DRRL
-- Sim-to-real transfer experiments (requires hardware)
-
-**Immediate next action:** merge PR #15, then Genesis perf regen + README rewrite.
+- Benchmarks vs DR classical / minimax / DRRL.
+- Sim-to-real transfer experiments (requires hardware).
