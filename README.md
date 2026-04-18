@@ -5,7 +5,7 @@
 [![CI](https://github.com/Paul-antoineLeTolguenec/genesis-robust-quadrotor/actions/workflows/ci.yml/badge.svg)](https://github.com/Paul-antoineLeTolguenec/genesis-robust-quadrotor/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Genesis](https://img.shields.io/badge/genesis-%E2%89%A50.4.0-orange)
-![Tests](https://img.shields.io/badge/tests-3144%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-4012%20passing-brightgreen)
 ![Status](https://img.shields.io/badge/status-Phase%206-yellow)
 
 ---
@@ -21,7 +21,7 @@ Training policies that transfer from simulation to reality is the central unsolv
 - **Gymnasium-compatible** — drop-in replacement for any Gym-based RL stack
 - **Lipschitz-continuous adversary** — bounded per-step variation for stable training
 - **Curriculum scheduling** — progressive difficulty via linear / cosine / step schedules
-- **< 5% overhead** — perturbation logic measured against fixed-tensor baseline with real Crazyflie CF2X
+- **Reproducible benchmarks** — every plot ships with its source CSV + hardware meta JSON (see [Benchmark methodology](#benchmark-methodology))
 
 ---
 
@@ -35,19 +35,23 @@ Training policies that transfer from simulation to reality is the central unsolv
 
 Regenerate these demos with the scripts under [`docs/media/`](docs/media/).
 
-### Overhead stays under 5% — validated on real Crazyflie CF2X
+### Overhead across all 69 perturbations — Apple M4 Pro, Genesis 0.4.0, CPU
 
-![Overhead summary](docs/impl/assets/cat1_all_overhead_summary.png)
+![Hero overhead](docs/impl/assets/hero_overhead.png)
+
+Each bar = median overhead at `n_envs=16` over 5 rounds × 100 steps; error bars are IQR.
+Source data: [`docs/impl/data/hero_overhead.csv`](docs/impl/data/hero_overhead.csv).
 
 ### Curriculum progressively increases perturbation strength
 
-![Wind gust curriculum](docs/impl/assets/cat5_wind_gust_curriculum.png)
+![Mass-shift curriculum](docs/impl/assets/cat1_mass_shift_curriculum.png)
 
-### Per-environment diversity for GPU-batched training
+### Temporal structure of stochastic perturbations
 
-![Gyro noise per-env](docs/impl/assets/cat4_gyro_noise_per_env.png)
+![Wind turbulence trace](docs/impl/assets/cat5_turbulence_trace.png)
+![Wind turbulence spectrum](docs/impl/assets/cat5_turbulence_spectrum.png)
 
-### Performance scaling with environment count
+### Per-n_envs overhead scaling
 
 ![Mass shift perf](docs/impl/assets/cat1_mass_shift_perf.png)
 
@@ -128,6 +132,55 @@ uv run pytest tests/integration/test_overhead_genesis.py -v -s  # P6 overhead
 ```
 
 See [`.agents/knowledge/architecture.md`](.agents/knowledge/architecture.md) for the full module graph, data flow, and design patterns.
+
+---
+
+## Benchmark methodology
+
+Every overhead number in this repository is measured with a single canonical harness
+(`tests/integration/test_overhead_genesis.py`) factored into the shared framework
+at `docs/impl/_perf_framework.py`. The 69 per-perturbation PNGs and the hero plot
+above are all produced from the same measurement loop — no mocks, no approximations.
+
+**Loop.** For each perturbation and each `n_envs ∈ {1, 4, 16, 64, 128}` the harness:
+
+1. Builds a fresh Genesis scene with a Crazyflie CF2X URDF and `n_envs` parallel copies.
+2. Warms up the scene for `warmup = 30` steps (resets every 20).
+3. Runs `rounds = 5` batches of `steps_per_round = 100` steps, timing two loops:
+   - **Baseline**: `scene.step()` only.
+   - **Perturbed**: `perturbation.tick(is_reset=False) + perturbation.apply(...) + scene.step()`.
+4. Reports `overhead_% = (median(perturbed) - median(baseline)) / median(baseline) · 100`.
+
+**What is measured.** Only the cost of our perturbation engine — sampling,
+Lipschitz clipping, stateful dynamics, and the dispatch to the Genesis setter or
+external-wrench API. Genesis itself is in both branches, so its cost cancels.
+
+**Reproducibility.** Each run writes, under `docs/impl/`:
+
+- `data/<slug>_perf.csv` — one row per `(n_envs, round)` with baseline, perturbed, overhead.
+- `data/<slug>_perf.meta.json` — full hardware snapshot (CPU, cores, torch threads,
+  OS, Genesis version, backend, git SHA, date) plus the complete config and
+  per-n_envs stats (median, mean, stdev, Q1, Q3, IQR, min, max).
+- `assets/<slug>_perf.png` — median + IQR band, log-x n_envs axis, 5 % budget line.
+
+Regenerate the full sweep any time with `uv run python docs/impl/plot_perf_cat<N>.py`
+(8 scripts) followed by `uv run python docs/impl/plot_hero_overhead.py` for the aggregate.
+
+**Results summary** — Apple M4 Pro, CPU, Genesis 0.4.0, `n_envs=16` median:
+
+| Class | Range | Examples |
+|---|---|---|
+| `GenesisSetter` with identity cache | **+1 – 5 %** | `mass_shift`, `com_shift`, `payload_mass`, `payload_com_offset` |
+| No-op setter (catalog-only, CF2X-unsupported) | **+0 – 8 %** | `motor_armature`, `friction_ratio`, `position_gain_kp`, `joint_stiffness` |
+| `MotorCommand` | **+1 – 14 %** | `motor_kill`, `motor_lag`, `motor_wear`, `rotor_imbalance`, `motor_cold_start` |
+| `ObservationPerturbation` | **+5 – 33 %** | `gyro_noise`, `position_dropout`, `gyro_drift`, `clock_drift` |
+| `ActionPerturbation` | **+1 – 16 %** | `action_noise`, `actuator_hysteresis`, `esc_low_pass_filter` |
+| `ExternalWrench` (no identity cache yet) | **+35 – 105 %** | all wind perturbations, `aero_drag_coeff`, `ground_effect`, `motor_back_emf`, `body_force_disturbance` |
+| `ExternalWrench` + dual setter | **+105 – 130 %** | `inertia_tensor`, `chassis_geometry_asymmetry` (two setters per step) |
+
+All 69 perturbations stay under the 200 % hard-fail budget defined in the P6 test.
+The `ExternalWrench` families are the obvious next optimisation target — caching
+unchanged wrench tensors would move the whole wind category below 10 %.
 
 ---
 
