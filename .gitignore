@@ -27,3 +27,7 @@ htmlcov/
 
 # Generated demo MP4s (GIFs are committed, MP4s are regeneratable)
 docs/media/*.mp4
+
+# Agent worktrees (ephemeral)
+.worktrees/
+.claude/worktrees/
