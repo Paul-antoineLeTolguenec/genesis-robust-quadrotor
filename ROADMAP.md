@@ -99,11 +99,14 @@ Update status when starting (`in_progress`) and when done (`completed`).
 - [x] README showcase (badges, plots, quickstart) — PR #13
 - [x] Genesis hover demo GIFs (baseline vs wind_gust) — PR #14
 - [x] Scientific plot refactor — PR #15 merged (shared framework + 123 viz PNG across 8 cats)
-- [~] Genesis perf regen (feat/phase6-perf-regen) — 69/69 perturbations, 207 artifacts
+- [x] Genesis perf regen — PR #16 merged (69/69 perturbations, 207 artifacts)
   - [x] Shared `docs/impl/_perf_framework.py` — Genesis init + build_scene + measure_overhead
   - [x] `plot_perf_cat{1..8}.py` — one script per category, unified methodology
   - [x] 69 × (`_perf.csv` + `_perf.meta.json` + `_perf.png`) under `docs/impl/{data,assets}/`
-- [ ] README rewrite with benchmark methodology + hardware-annotated plots
+- [~] README rewrite with benchmark methodology + hardware-annotated plots (feat/phase6-readme-v2)
+  - [x] `docs/impl/plot_hero_overhead.py` + `hero_overhead.{csv,meta.json,png}` (69 perturbations aggregate)
+  - [x] Honest per-class overhead table replacing the "< 5 %" claim
+  - [x] Benchmark methodology section (baseline/perturbed, warmup, rounds, reproducibility)
 - [ ] Perturbation registry + auto-doc API
 - [ ] Full API reference
 - [ ] Example notebooks
@@ -136,9 +139,21 @@ across 69 perturbations (Apple M4 Pro, CPU). Identity-cache fix on
   - InertiaTensor / ChassisGeometryAsymmetry trigger two setters per step → +100–130%.
   - MotorCommand / ObservationPerturbation / ActionPerturbation: +0–30% typically.
 
+**README rewrite (feat/phase6-readme-v2):**
+- New hero plot `docs/impl/assets/hero_overhead.png` aggregates the 69 perturbations
+  (median + IQR @ n_envs=16), colored by category, with the 5 % budget line.
+- The "< 5 % overhead" marketing claim was dropped in favour of a per-class table
+  that reports the real cost of each apply signature.
+- New **Benchmark methodology** section documents the harness
+  (baseline = `scene.step()` only, perturbed = `tick + apply + step`, warmup=30,
+  rounds=5, steps=100, reset_every=20, n_envs ∈ {1, 4, 16, 64, 128}) and how to
+  reproduce any number from the CSV + meta JSON pair that ships with each plot.
+
 **Remaining Phase 6 items:**
-- Open PR #16 (Genesis perf regen).
-- README rewrite with benchmark methodology + hardware-annotated plots.
+- Perturbation registry + auto-doc API.
+- Full API reference.
+- Example notebooks.
+- PyPI release.
 
 **Phase 5 deferred items:**
 - Benchmarks vs DR classical / minimax / DRRL.
